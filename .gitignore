@@ -1,0 +1,28 @@
+
+# Microsoft Office temporary and lock files
+~$*
+*.tmp
+
+# macOS and Windows system files
+.DS_Store
+.AppleDouble
+Thumbs.db
+Desktop.ini
+
+# Editor backups and temporary files
+*.bak
+*.swp
+*.swo
+*~
+
+# Environment files and credentials
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+
+# Private information
+secrets/
+private/
+credentials.json
