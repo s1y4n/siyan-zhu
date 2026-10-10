@@ -12,6 +12,8 @@ I also work as a server at Hawaiʻi Pot Shabu Shabu House. Through this job, I h
 
 Currently, I am looking for internship opportunities in marketing or financial analysis. I hope to apply what I have learned in school, gain real world experience, and continue developing my skills for my future career.
 
+Reviewed for grammar and clarity with help from ChatGPT (OpenAI, 2026); originally written and edited by me.
+
 ## Engagement Index
 
 | Engagement | Capability | Description |
