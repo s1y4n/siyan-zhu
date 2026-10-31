@@ -12,7 +12,7 @@
 
 ## Work Experience
 
-**Hawaiʻi Pot Shabu Shabu House — Server**
+**Hawaiʻi Pot Shabu Shabu House — Server — November 2024 – Present**
 
 - Provide customer service and help customers with their dining experience.
 - Communicate with customers and coworkers in a fast-paced environment.
@@ -21,14 +21,14 @@
 
 ## Leadership Experience
 
-**Chinese Club, University of Hawaiʻi at Mānoa — Vice President**
+**Chinese Club, University of Hawaiʻi at Mānoa — Vice President — August 2026 – Present**
 
 - Help plan and organize cultural events and activities for students.
 - Communicate with professors to promote club events and recruit new members.
 - Work with executive board members to plan events and manage club activities.
 - Help create promotional materials and announcements for students.
 
-**Church in Honolulu, University of Hawaiʻi at Mānoa — Secretary**
+**Church in Honolulu, University of Hawaiʻi at Mānoa — Secretary — August 2023 – Present**
 
 - Help with club communications and administrative tasks.
 - Support the planning and organization of club activities.
