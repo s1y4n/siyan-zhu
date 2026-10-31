@@ -28,3 +28,30 @@
 
 **Result:**
 Created the initial portfolio structure for future projects.
+
+## October 30, 2026 — FX Hedging Stage 1 Executive Brief
+
+**AI Tool:** ChatGPT (OpenAI)
+
+**Task:** Complete Stage 1 of the FX Hedging project using Scenario 9 (lab-instruments).
+
+**What I asked AI to do:**
+- Explain the Stage 1 requirements and my assigned scenario.
+- Help me understand the three hedging strategies: forward contract, money-market hedge, and put option.
+- Check my calculations and provide feedback on my writing.
+- Correct grammar, remove repetition, and organize my original draft while keeping my writing style.
+- Help prepare the final Markdown file and guide me through uploading it to GitHub.
+- Help correct the missing folder and resume dates from Stage 0.
+
+**What I checked or changed:**
+- Reviewed and revised the suggested wording to keep my writing style.
+- Checked the scenario information and financial calculations.
+- Reviewed the final brief and confirmed the required sections were included.
+- Verified that the files were uploaded to the correct GitHub folders.
+
+**Errors or limitations:**
+- AI initially used the October 23 deadline from my professor's email, but Lamakū showed October 30 as the actual assignment deadline.
+- The exchange rates used to illustrate potential losses were hypothetical, not actual market rates.
+- The final hedging recommendation still requires market data and model validation in later stages.
+
+**Result:** Completed the Stage 1 Executive Brief and committed the Markdown file to my GitHub portfolio.
