@@ -64,32 +64,64 @@ All inputs should be exposed as workbook **named ranges** so Calculation Flow (�
 
 ### 2.1 Core Inputs
 
-| Standardized Name | Description | Unit | Example |
-|-------------------|-------------|------|--------:|
-| `FC_AMT` | Foreign-currency notional (receivable or payable) | FC | 10,000,000 GBP |
-| `S0_in` | Spot exchange rate at inception | USD per FC | 1.4600 |
-| `F0_in` | Forward rate to settlement | USD per FC | 1.4400 |
-| `R_USD` | USD interest rate to settlement | Annual % | 6.00% |
-| `R_FC` | Foreign-currency interest rate to settlement | Annual % | 6.50% |
-| `T_DAYS` | Days to settlement | Days | 365 |
-| `BASIS` | Day-count denominator (single-value simplification) | Days | 360 (USD, EUR) / 365 (GBP) |
-| `BASIS_USD` *(optional, rigorous variant)* | USD-leg day-count denominator | Days | 360 |
-| `BASIS_FC` *(optional, rigorous variant)* | FC-leg day-count denominator | Days | 360 (EUR) / 365 (GBP) |
-| `K_PUT` | Put option strike (receivables) | USD per FC | 1.4600 |
-| `K_CALL` | Call option strike (payables) | USD per FC | 1.8000 |
-| `PREM_PUT` | Put premium, USD per 1 FC | USD | 0.015 |
-| `PREM_CALL` | Call premium, USD per 1 FC | USD | 0.010 |
+| Named Range | Description | Placeholder Value | Unit | Stage 4 Source |
+|---|---|---|---|---|
+| `FC_AMT` | EUR receivable | 5,100,000 | EUR | Scenario 9 (fixed) |
+| `S0_in` | EUR/USD spot rate | 1.1165 (indicative) | USD/EUR | ECB, Nov. 6, 2026 |
+| `F0_in` | 182-day forward rate | 1.1705 (indicative) | USD/EUR | Live forward quote or CIP-implied rate |
+| `R_USD` | Annual USD interest rate | 4.19% (indicative) | Annual % | Federal Reserve H.15 / FRED DGS6MO, Nov. 5, 2026 |
+| `R_FC` | Annual EUR interest rate | 3.014% (indicative) | Annual % | Bank of Finland, 6-month Euribor, Nov. 5, 2026 |
+| `K_PUT` | Put option strike | 1.1165 (indicative) | USD/EUR | Set equal to S0_in (ECB spot-rate placeholder) |
+| `K_CALL` | Call option strike | 1.1165 (indicative) | USD/EUR | Set equal to S0_in (ECB spot-rate placeholder) |
+| `PREM_PUT` | Put premium per EUR | 0.0194 | USD/EUR | Scenario 9 (fixed) |
+| `PREM_CALL` | Call premium per EUR | 0.0296 | USD/EUR | Scenario 9 (fixed) |
+| `T_DAYS` | Days to settlement | 182 | Days | Scenario 9 (fixed) |
+| `BASIS` | Day-count denominator | 360 | Days | ACT/360 assumption |
+
+**S0_in Source:** European Central Bank (ECB),
+Euro Foreign Exchange Reference Rates,
+November 6, 2026. EUR 1 = USD 1.1165.
+
+This is an indicative daily reference rate
+that will be updated during Stage 4.
+
+https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/eurofxref-graph-usd.en.html
+
+**R_USD Source:** Federal Reserve Board, H.15
+Selected Interest Rates, via FRED (DGS6MO).
+The six-month U.S. Treasury constant-maturity
+yield was 4.19% on November 5, 2026.
+
+This rate serves as an indicative proxy for
+the company's six-month USD investment rate.
+The model assumes simple interest using
+ACT/360. The rate will be updated with
+appropriate market data in Stage 4.
+
+https://fred.stlouisfed.org/series/DGS6MO/
+
+**R_FC Source:** Bank of Finland, Euribor Rates. The six-month Euribor rate was 3.014% on November 5, 2026.
+
+This rate serves as an indicative benchmark for the company's six-month EUR borrowing rate. It uses the ACT/360 convention and will be replaced with an appropriate borrowing quote during Stage 4.
+
+https://www.suomenpankki.fi/en/statistics/interest-rates-and-exchange-rates/euribor-rates/
+
+**K_PUT and K_CALL Assumptions:** Both option strike prices are set equal to the indicative spot rate (S0_in = 1.1165 USD/EUR), making them at-the-money. This follows the Scenario 9 instructions. The strikes will be reviewed when the spot rate is updated in Stage 4. The put option is used to hedge the company's EUR receivable; the call input is retained for the standardized model and potential payable scenarios.
+
+**Covered Interest Rate Parity Note:** The scenario-assigned forward rate (F0_in = 1.1705) may differ from the forward rate implied by the independently sourced spot and interest-rate placeholders. This difference will be documented in the model's parity validation check. Consistent market quotes will be reviewed during Stage 4 before applying a strict parity tolerance.
 
 ### 2.2 Derived / Intermediate Values
 
-| Name | Description | Source |
-|------|-------------|--------|
-| `FV_PREM_PUT` | Future value of put premium at settlement | `−PREM_PUT × FC_AMT × (1 + R_USD × T_DAYS/BASIS)` |
-| `FV_PREM_CALL` | Future value of call premium at settlement | `−PREM_CALL × FC_AMT × (1 + R_USD × T_DAYS/BASIS)` |
-| `S_T_grid` | Sensitivity spot grid at settlement | Built from `S0_in` ± 5% in 1% steps |
-| `USD_NO_HEDGE` | USD proceeds / outlay under no hedge | `S_T × FC_AMT` |
+| Name | Description | Formula / Source |
+|---|---|---|
+| `DF_USD` | USD accumulation factor | `1 + R_USD * T_DAYS / BASIS` |
+| `DF_FC` | EUR accumulation factor | `1 + R_FC * T_DAYS / BASIS` |
+| `FV_PREM_PUT` | Future value of put premium at settlement | `-PREM_PUT * FC_AMT * DF_USD` |
+| `FV_PREM_CALL` | Future value of call premium at settlement | `-PREM_CALL * FC_AMT * DF_USD` |
+| `S_T_grid` | Settlement exchange-rate sensitivity grid | `S_T(i) = S0_in * (0.95 + 0.01 * i), where i = 0, 1, ..., 10` |
+| `USD_NO_HEDGE` | USD proceeds without hedging |USD_NO_HEDGE(i) = S_T(i) * FC_AMT|
 
-> <span style="color:#024731;">**Tip:**</span> Keep labels short and standardized — these names become Excel named ranges *and* the AI prompt parameters in Stage 3.
+**Day-count convention:** `BASIS = 360` for both USD and EUR (ACT/360).
 
 ---
 
