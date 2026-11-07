@@ -54,4 +54,30 @@ Created the initial portfolio structure for future projects.
 - The exchange rates used to illustrate potential losses were hypothetical, not actual market rates.
 - The final hedging recommendation still requires market data and model validation in later stages.
 
-**Result:** Completed the Stage 1 Executive Brief and committed the Markdown file to my GitHub portfolio.
+**Result:** Completed the Stage 1 Executive Brief and committed the Markdown file to my GitHub portfolio
+
+## Stage 2 — FX Hedging Model Specification Review
+
+**Date:** 2026-11-07  
+**AI Tool:** ChatGPT  
+**Purpose:** Review and revise the FX hedging technical specification before the Stage 3 workbook build.
+
+### Review Request
+
+I asked ChatGPT to review my Stage 2 specification as I developed it, explain unclear financial formulas, identify inconsistencies, and help improve the document's organization and validation rules.
+
+### AI Feedback
+
+One issue identified was that the scenario-assigned forward rate of 1.1705 USD/EUR was inconsistent with the forward rate implied by my independently sourced spot and interest-rate placeholders. The original template expected the money-market hedge and forward hedge to agree within a 0.05% tolerance, which would fail using my initial inputs even if the calculations were correct.
+
+### Revision Made
+
+I revised the calculation flow and validation rules to calculate the implied forward rate (`F_IMPLIED`), compare it against the assigned forward rate (`F0_in`), and flag any discrepancy above the specified tolerance. I also clarified that consistent market quotations will be reviewed in Stage 4.
+
+### Decision and Reasoning
+
+I accepted this correction because a failed parity comparison can arise from inconsistent market inputs rather than an incorrect formula. Explicitly identifying the discrepancy makes the model easier to audit and prevents misleading validation results.
+
+### Result
+
+The revised specification includes a more detailed parity check and clearer money-market calculation instructions for the Stage 3 AI-assisted workbook build.
