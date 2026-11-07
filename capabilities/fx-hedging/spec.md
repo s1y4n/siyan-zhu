@@ -204,11 +204,14 @@ For a EUR payable, the company would buy EUR forward, borrow USD and invest in E
 
 ## 6. Sensitivity Plan
 
-- **Grid:** `S_T_grid` spans `S0_in × (1 ± 5%)` in 1% increments → 11 rows (including the baseline).
-- **Strategies plotted:** no hedge, forward, money market, option (put for receivable / call for payable).
-- **Primary chart:** line chart with `S_T` on the x-axis and USD proceeds (or outlay) on the y-axis. Forward and money-market series are horizontal by construction; no-hedge is a straight line through the origin; option is piecewise-linear with a kink at the strike.
-- **Secondary table:** hedge profit vs. no hedge for each strategy, to make the visual intuition numeric.
-- **What the chart should communicate:** the trade-off between **certainty** (forward / money-market, flat lines), **optionality** (put / call, kinked payoff), and **naked exposure** (no hedge, unbounded on both sides).
+The `Sensitivity` worksheet will compare all four strategies across 11 settlement exchange-rate scenarios.
+
+- **Exchange-rate grid:** `S_T(i) = S0_in * (0.95 + 0.01 * i)`, where `i = 0, 1, ..., 10`. This covers ±5% of the initial spot rate in 1% increments, including the baseline.
+- **Strategy comparison:** Calculate `USD_NO_HEDGE(i)`, `USD_FWD`, `USD_MM`, and `USD_PUT(i)` for every scenario using the formulas in Section 5.
+- **Comparison chart:** Create one line chart with `S_T(i)` (USD/EUR) on the x-axis and USD proceeds on the y-axis. The forward and money-market lines remain flat, the unhedged line changes linearly, and the put-option line provides a floor with upside potential.
+- **Additional outputs:** Include hedge profit versus no hedge and identify both the highest-proceeds strategy overall and the best active hedge for each scenario.
+
+The chart will help the CFO compare guaranteed proceeds, downside protection, option costs, and exposure to favorable or unfavorable exchange-rate movements.
 
 ---
 
