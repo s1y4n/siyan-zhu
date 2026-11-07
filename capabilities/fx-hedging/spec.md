@@ -43,8 +43,8 @@ BRAND FORMATTING — applied per docs/_branding/design.json (v1.0.0)
 | **Created by** | Siyan Zhu |
 | **Updated by** | Siyan Zhu |
 | **Date Created** | 2026-11-06 |
-| **Date Updated** | 2026-11-06 |
-| **Version** | 0.2|
+| **Date Updated** | 2026-11-07 |
+| **Version** | 0.3|
 | **LLM Used** (optional) | ChatGPT — specification review and feedback |
 | **Role** | Treasury Analyst / FP&A Analyst |
 | **Audience** | CFO / Director of Treasury |
@@ -82,7 +82,7 @@ All inputs are defined as workbook named ranges so Calculation Flow (§5) can be
 
 - **`S0_in` (1.1165 USD/EUR):** European Central Bank, November 6, 2026. Indicative daily reference rate, not a market-close quote. [ECB Exchange Rates](https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/eurofxref-graph-usd.en.html)
 - **`R_USD` (4.19%):** Federal Reserve H.15 / FRED, six-month Treasury yield, November 5, 2026. Used as an indicative USD investment-rate proxy. [FRED DGS6MO](https://fred.stlouisfed.org/series/DGS6MO/)
-- **`R_FC` (3.014%):** Bank of Finland, six-month Euribor, November 5, 2026. Used as an indicative EUR borrowing-rate benchmark. [Euribor Rates](https://www.suomenpankki.fi/en/statistics/interest-rates-and-exchange_rates/euribor-rates/)
+- **`R_FC` (3.014%):** Bank of Finland, six-month Euribor, November 5, 2026. Used as an indicative EUR borrowing-rate benchmark. [Euribor Rates](https://www.suomenpankki.fi/en/statistics/interest-rates-and-exchange-rates/euribor-rates/)
 - **Option Strikes:** `K_PUT` and `K_CALL` equal `S0_in` (1.1165 USD/EUR), making both options at-the-money.
 - **Parity:** The assigned forward rate (`F0_in = 1.1705`) differs from the rate implied by the spot and interest-rate placeholders. The discrepancy is reported in Section 7.
 
@@ -247,6 +247,13 @@ The Stage 3 workbook must satisfy these checks:
 
 The base case uses `S_T = S0_in`. The following results will be populated and verified during the Stage 3 workbook build and used as regression checkpoints when market data is updated in Stage 4. Scenario 9 concerns a EUR receivable; payable outputs are not applicable.
 
+| Strategy | USD Proceeds | Hedge Profit vs. No Hedge |
+|---|---:|---:|
+| No hedge | To be populated in Stage 3 | — |
+| Forward | To be populated in Stage 3 | To be populated in Stage 3 |
+| Money market | To be populated in Stage 3 | To be populated in Stage 3 |
+| Put option | To be populated in Stage 3 | To be populated in Stage 3 |
+
 ---
 
 ## Appendix A — Change Log
@@ -255,3 +262,4 @@ The base case uses `S_T = S0_in`. The following results will be populated and ve
 |---|---|---|---|
 | 0.1 | 2026-11-06 | Siyan Zhu | Initial Stage 2 specification draft |
 | 0.2 | 2026-11-07 | Siyan Zhu | Reorganized sections, added validation rules, and clarified model assumptions |
+| 0.3 | 2026-11-07 | Siyan Zhu | Refined model specification following AI review and documented validation improvements |
