@@ -217,40 +217,35 @@ The chart will help the CFO compare guaranteed proceeds, downside protection, op
 
 ## 7. Validation Rules
 
-The completed workbook must pass the following checks before its results are used for the Stage 5 decision memo:
+The Stage 3 workbook must satisfy these checks:
 
-- [ ] **Named Ranges:** All ten required inputs use the standardized names from Section 2.1. Calculations use named ranges rather than hardcoded cell references.
-- [ ] **Forward Hedge:** `USD_FWD = FC_AMT * F0_in`. Using the initial scenario values, the result must equal $5,969,550.
-- [ ] **Money-Market Hedge:** `FC_BORROW * DF_FC = FC_AMT`, `USD_NOW = FC_BORROW * S0_in`, and `USD_MM = USD_NOW * DF_USD`. Each calculation must appear separately.
-- [ ] **Covered Interest Rate Parity:** `F_IMPLIED = S0_in * DF_USD / DF_FC`. Compare the implied forward rate with `F0_in`. A discrepancy greater than 0.05% must be flagged. Because the current placeholder inputs are not parity-consistent, the model must report the difference rather than pass the check. Using the initial placeholders, F_IMPLIED should be approximately 1.123038 USD/EUR and USD_MM approximately $5,727,495.52. The difference from forward proceeds should be flagged as an input-consistency issue.
-- [ ] **Put Option:** At `S_T = K_PUT`, proceeds must equal `K_PUT * FC_AMT + FV_PREM_PUT`. The put payoff must provide downside protection while preserving upside after premium costs.
-- [ ] **Sensitivity Analysis:** The model must generate 11 scenarios from 95% to 105% of `S0_in`, including the baseline. Forward and money-market proceeds must remain constant across the scenarios.
-- [ ] **Workbook Integrity:** Calculated outputs must contain formulas, with no Excel errors such as `#REF!`, `#VALUE!`, or `#DIV/0!`. Sources and assumptions must be documented in the `Notes & Assumptions` worksheet, and cell colors must follow the Legend.
+- [ ] **Named Ranges:** All ten required names from Section 2.1 are defined; calculated outputs use formulas rather than hardcoded values.
+- [ ] **Forward Hedge:** `USD_FWD = FC_AMT * F0_in` must equal $5,969,550 using the initial placeholders and remain constant across all scenarios.
+- [ ] **Money-Market Hedge:** Verify `FC_BORROW * DF_FC = FC_AMT`, `USD_NOW = FC_BORROW * S0_in`, and `USD_MM = USD_NOW * DF_USD` in three separate calculation cells. Expected initial `USD_MM` is approximately $5,727,495.52.
+- [ ] **Interest Rate Parity:** Verify `F_IMPLIED = S0_in * DF_USD / DF_FC`. The parity check passes when `ABS(F0_in - F_IMPLIED) / F_IMPLIED <= 0.0005` (0.05%). The initial placeholders imply approximately 1.123038 USD/EUR, so this check must flag an input mismatch, not pass.
+- [ ] **Put Option:** At `S_T = K_PUT`, verify `USD_PUT = K_PUT * FC_AMT + FV_PREM_PUT`. Proceeds must stay at the net floor below the strike and increase above it.
+- [ ] **Sensitivity:** Generate exactly 11 scenarios from `0.95 * S0_in` to `1.05 * S0_in` in 1% steps. Include the baseline and verify that forward and money-market proceeds remain constant.
+- [ ] **Workbook Integrity:** No formula errors (`#REF!`, `#VALUE!`, `#DIV/0!`); calculated outputs are formula-driven. The `Notes & Assumptions` worksheet records sources and access dates. The Legend defines yellow inputs, blue assumptions, black formulas, and green cross-tab links.
 
 ---
 
 ## 8. Outputs
 
-| Output | Description | Format | Purpose |
-|--------|-------------|--------|---------|
-| Input panel | All named-range inputs with units, sources, and access dates | Inputs worksheet | Single source of truth |
-| Strategy summary | `USD_FWD`, `USD_MM`, `USD_BASE_k` per strategy, plus `USD_FLOOR_PUT` (receivable) / `USD_CEILING_CALL` (payable) | Cover summary and linked table above Sensitivity grid | Executive at-a-glance |
-| Sensitivity table | USD proceeds / outlay for each strategy across `S_T_grid` ± 5% | 	Sensitivity worksheet | Core analytical evidence |
-| Hedge-profit columns | `USD_k − USD_NO_HEDGE` for each strategy per row | Sub-table | Isolates hedge value-add |
-| Winner / best-hedge labels | `ARGMAX` / `ARGMIN` labels per row | Two label columns | Quick-read decision cue |
-| Sensitivity chart | Line chart of USD outcome vs. `S_T` for all four strategies | Embedded chart | Visual comparison |
-| Executive summary (Stage 5 decision memo) | 1–2 paragraph narrative with explicit recommendation | Separate memo | Downstream deliverable |
+| Output | Description / Named Results | Worksheet |
+|---|---|---|
+| Input panel | All required named inputs, values, units, and sources | `Inputs` |
+| Strategy summary | `USD_FWD`, `USD_MM`, `USD_BASE_k`, and `USD_FLOOR_PUT` | `Cover` and `Sensitivity` |
+| Parity diagnostics | `F_IMPLIED`, `PARITY_GAP`, and `USD_PARITY_GAP` | `Money Market` |
+| Sensitivity table | `S_T_grid` and `USD_NO_HEDGE(i)`, `USD_FWD`, `USD_MM`, `USD_PUT(i)` for all 11 scenarios | `Sensitivity` |
+| Hedge-profit columns | `HEDGE_PROFIT_k(i)` for each active hedge versus no hedge | `Sensitivity` |
+| Winner labels | Overall highest-proceeds strategy and best active hedge for each scenario | `Sensitivity` |
+| Comparison chart | One line chart comparing all four strategies against `S_T(i)` | `Sensitivity` |
+| Sources and assumptions | Source dates, rate conventions, exclusions, and validation notes | `Notes & Assumptions` |
+| Stage 5 decision memo | Final recommendation supported by the workbook's results | Separate downstream deliverable |
 
 ### 8.1 Computed Base-Case Values
 
-Record the base-case outcome at `S_T = S0_in` once the model is built. This block serves as a regression checkpoint for the Stage 3 build and the Stage 4 repopulation.
-
-| Strategy | USD Proceeds (Receivable) | USD Outlay (Payable) | Hedge Profit vs. No Hedge |
-|----------|--------------------------:|---------------------:|--------------------------:|
-| No hedge | | | — |
-| Forward | | | |
-| Money market | | | |
-| Option (put / call) | | | |
+The base case uses `S_T = S0_in`. The following results will be populated and verified during the Stage 3 workbook build and used as regression checkpoints when market data is updated in Stage 4. Scenario 9 concerns a EUR receivable; payable outputs are not applicable.
 
 ---
 
