@@ -58,26 +58,52 @@ Created the initial portfolio structure for future projects.
 
 ## Stage 2 — FX Hedging Model Specification Review
 
-**Date:** 2026-11-07  
+**Date:** November 7, 2026  
 **AI Tool:** ChatGPT  
-**Purpose:** Review and revise the FX hedging technical specification before the Stage 3 workbook build.
+**Purpose:** Develop, review, and improve the Stage 2 technical specification before the Stage 3 workbook build.
 
-### Review Request
+### Prompt 1 — Review and Organization
 
-I asked ChatGPT to review my Stage 2 specification as I developed it, explain unclear financial formulas, identify inconsistencies, and help improve the document's organization and validation rules.
+**My actual prompt:**
 
-### AI Feedback
+"This is everything. Make sure to order all of them correctly first."
 
-One issue identified was that the scenario-assigned forward rate of 1.1705 USD/EUR was inconsistent with the forward rate implied by my independently sourced spot and interest-rate placeholders. The original template expected the money-market hedge and forward hedge to agree within a 0.05% tolerance, which would fail using my initial inputs even if the calculations were correct.
+**AI Feedback:**
 
-### Revision Made
+ChatGPT identified duplicated section numbers and overlapping sections in my specification. The original template contained ten sections, while the current Stage 2 assignment required eight sections.
 
-I revised the calculation flow and validation rules to calculate the implied forward rate (`F_IMPLIED`), compare it against the assigned forward rate (`F0_in`), and flag any discrepancy above the specified tolerance. I also clarified that consistent market quotations will be reviewed in Stage 4.
+**Revision Made:**
 
-### Decision and Reasoning
+I reorganized the specification into the eight required sections, moved the Sensitivity Plan to Section 6, incorporated the auditability checklist into Section 7 (Validation Rules), and moved Outputs to Section 8.
 
-I accepted this correction because a failed parity comparison can arise from inconsistent market inputs rather than an incorrect formula. Explicitly identifying the discrepancy makes the model easier to audit and prevents misleading validation results.
+### Prompt 2 — Evaluating AI Suggestions
 
-### Result
+**My actual prompt:**
 
-The revised specification includes a more detailed parity check and clearer money-market calculation instructions for the Stage 3 AI-assisted workbook build.
+"No, walk me through everything to fix it by myself."
+
+**Decision and Reasoning:**
+
+ChatGPT initially suggested replacing my specification with an automatically reorganized file. I rejected this approach because I wanted to understand the changes and make them myself. Instead, I accepted the recommended section order and manually revised the document in GitHub.
+
+### Additional Technical Review — Covered Interest Rate Parity
+
+**Issue Identified:**
+
+ChatGPT identified an inconsistency between the scenario-assigned forward rate of 1.1705 USD/EUR and the implied forward rate calculated using my spot and interest-rate placeholders.
+
+**Before Revision:**
+
+The original template required the money-market hedge and forward hedge to agree within 0.05%, without addressing the possibility of inconsistent placeholder inputs.
+
+**After Revision:**
+
+I updated Sections 5 and 7 to calculate the implied forward rate (`F_IMPLIED`), compare it with the assigned forward rate (`F0_in`), and flag discrepancies exceeding the 0.05% tolerance. I also specified that consistent market quotations would be reviewed in Stage 4.
+
+**Decision and Reasoning:**
+
+I accepted this correction because a failed parity check may result from inconsistent market inputs rather than incorrect formulas. Documenting the discrepancy improves the model's transparency and auditability.
+
+### Reflection
+
+I used ChatGPT throughout the drafting and review process to understand financial concepts, develop formulas, improve the document's organization, and identify inconsistencies. Rather than automatically accepting every suggestion, I reviewed the feedback and made revisions manually in GitHub. This helped me better understand the model's calculations and create a clearer specification for the Stage 3 AI-assisted workbook build.
