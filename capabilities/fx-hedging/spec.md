@@ -34,39 +34,27 @@ BRAND FORMATTING — applied per docs/_branding/design.json (v1.0.0)
   Full brand standard: docs/_branding/design.json · Source: https://manoa.hawaii.edu/brand/
 -->
 
-# [COMPANY NAME] — FX Transaction Hedge Model · Technical Specification
+# U.S. Laboratory Instruments Manufacturer (Scenario 9) — FX Transaction Hedge Model · Technical Specification
 
 > <span style="color:#024731; font-weight:700;">Technical specification</span> for the FX transaction hedge model — the named-range contract, calculation flow, and validation checks, precise enough that an AI or a colleague could build (or rebuild) the workbook from this document alone. This spec is the input the AI-assisted build works from.
 
 | Field | Value |
 |------|------|
-| **Created by** | [name] |
-| **Updated by** | [name] |
-| **Date Created** | [YYYY-MM-DD] |
-| **Date Updated** | [YYYY-MM-DD] |
-| **Version** | [0.0] |
-| **LLM Used** (optional) | [LLM name and how it was used] |
+| **Created by** | Siyan Zhu |
+| **Updated by** | Siyan Zhu |
+| **Date Created** | 2026-11-06 |
+| **Date Updated** | 2026-11-06 |
+| **Version** | 0.1 |
+| **LLM Used** (optional) | ChatGPT — specification review and feedback |
 | **Role** | Treasury Analyst / FP&A Analyst |
 | **Audience** | CFO / Director of Treasury |
-| **Companion Workbook** | student build |
+| **Companion Workbook** | 	model.xlsx (planned for Stage 3)|
 
 ---
 
 ## 1. Problem Statement
 
-Briefly restate the exposure, timing, and objective in professional terms (3–5 sentences).
-
-<details>
-<summary><span style="color:#024731; font-weight:600;">Example phrasing (Receivable)</span></summary>
-
-> [Company] expects a [FC amount] receivable denominated in [EUR/GBP/JPY] settling in [T] days. A [depreciation/appreciation] in [currency pair] over that horizon would reduce realized USD proceeds and compress [gross margin / earnings / cash-flow coverage]. This specification documents the analytical framework used to quantify and compare four strategies — **no hedge**, **forward hedge**, **money-market hedge**, and **option (put) hedge** — and to produce the sensitivity evidence that supports the Stage 5 decision memo.
-</details>
-
-**Include:**
-- Exposure type (receivable or payable) and functional currency
-- Foreign-currency amount, quote convention (USD per FC), settlement date
-- Objective (protect USD value, preserve upside, minimize premium cost, etc.)
-- Decision context (corporate treasury, business unit, board-approved policy)
+A U.S.-based manufacturer of laboratory mass spectrometers is owed €5,100,000 by an Austrian research institute, with payment due in 182 days. Since the payment will be received in euros but converted into U.S. dollars, the company faces foreign exchange risk because the euro amount is fixed while the dollar value remains uncertain. For example, if the exchange rate drops from a hypothetical 1.20 to 1.10 USD per euro, the company's dollar receipts would decrease from $6,120,000 to $5,610,000, representing a loss of $510,000 (8.33%) that could negatively affect its budget and cash flow. This specification outlines the framework for comparing four strategies: no hedge, a forward contract, a money-market hedge, and a put option. By analyzing USD proceeds under different exchange-rate scenarios, the model will provide the sensitivity evidence needed to support the company's final hedging recommendation in Stage 5.
 
 ---
 
