@@ -60,7 +60,7 @@ A U.S.-based manufacturer of laboratory mass spectrometers is owed €5,100,000 
 
 ## 2. Inputs (Known Variables)
 
-All inputs should be exposed as workbook **named ranges** so Calculation Flow (§4) reads the same whether implemented in Excel, Python, or an AI prompt. Dates, sources, and access timestamps are recorded in the Notes tab. Market inputs (spot, forward, rates, premia) are the only cells an analyst should adjust for scenario work.
+All inputs are defined as workbook named ranges so Calculation Flow (§5) can be implemented consistently in Excel or by AI. Data sources and access dates will be recorded in the `Notes & Assumptions` worksheet. Market placeholders, including spot and forward rates, interest rates, and option strikes, will be reviewed in Stage 4. Scenario-assigned amounts, maturity, and option premiums remain fixed.
 
 ### 2.1 Core Inputs
 
@@ -163,6 +163,8 @@ The FX hedging model uses the following assumptions and constraints:
 
 7. **Model Scope:** The model evaluates a single EUR receivable and compares no hedge, a forward hedge, a money-market hedge, and a put option hedge. Credit risk, changes in interest rates before settlement, and additional operational costs are excluded.
 
+The model also excludes dynamic hedging, volatility-based option pricing, formal hedge-accounting treatment, and multi-currency portfolio effects.
+
 ---
 
 ## 5. Calculation Flow
@@ -225,7 +227,7 @@ For each `S_T` in `S_T_grid`:
 ### Step 6 — Summary metrics (scalar outputs)
 
 - `USD_FLOOR_PUT` = `MIN(USD_PUT)` across `S_T_grid` *(worst-case put outcome on the grid; payable tab uses `USD_CEILING_CALL = MAX(USD_CALL)` instead)*
-- `USD_BASE_k` = `USD_k` evaluated at `S_T = S0_in` for each strategy *(the "baseline" row feeds §5.1)*
+- `USD_BASE_k` = `USD_k` evaluated at `S_T = S0_in` for each strategy *(the "baseline" row feeds §8.1)*
 
 *`HEDGE_PROFIT_k` is per-row and lives inside the Step 5 grid, not here.*
 
@@ -247,21 +249,31 @@ For a payable of `FC_AMT` to be settled in FC at maturity, the model mirrors Ste
 
 ## 7. Validation Rules
 
+The completed workbook must pass the following checks before its results are used for the Stage 5 decision memo:
+
+- [ ] **Named Ranges:** All ten required inputs use the standardized names from Section 2.1. Calculations use named ranges rather than hardcoded cell references.
+- [ ] **Forward Hedge:** `USD_FWD = FC_AMT * F0_in`. Using the initial scenario values, the result must equal $5,969,550.
+- [ ] **Money-Market Hedge:** `FC_BORROW * DF_FC = FC_AMT`, `USD_NOW = FC_BORROW * S0_in`, and `USD_MM = USD_NOW * DF_USD`. Each calculation must appear separately.
+- [ ] **Covered Interest Rate Parity:** `F_IMPLIED = S0_in * DF_USD / DF_FC`. Compare the implied forward rate with `F0_in`. A discrepancy greater than 0.05% must be flagged. Because the current placeholder inputs are not parity-consistent, the model must report the difference rather than pass the check. Using the initial placeholders, F_IMPLIED should be approximately 1.123038 USD/EUR and USD_MM approximately $5,727,495.52. The difference from forward proceeds should be flagged as an input-consistency issue.
+- [ ] **Put Option:** At `S_T = K_PUT`, proceeds must equal `K_PUT * FC_AMT + FV_PREM_PUT`. The put payoff must provide downside protection while preserving upside after premium costs.
+- [ ] **Sensitivity Analysis:** The model must generate 11 scenarios from 95% to 105% of `S0_in`, including the baseline. Forward and money-market proceeds must remain constant across the scenarios.
+- [ ] **Workbook Integrity:** Calculated outputs must contain formulas, with no Excel errors such as `#REF!`, `#VALUE!`, or `#DIV/0!`. Sources and assumptions must be documented in the `Notes & Assumptions` worksheet, and cell colors must follow the Legend.
+
 ---
 
 ## 8. Outputs
 
 | Output | Description | Format | Purpose |
 |--------|-------------|--------|---------|
-| Input panel | All named-range inputs with units, sources, and access dates | Top of each tab | Single source of truth |
+| Input panel | All named-range inputs with units, sources, and access dates | Inputs worksheet | Single source of truth |
 | Strategy summary | `USD_FWD`, `USD_MM`, `USD_BASE_k` per strategy, plus `USD_FLOOR_PUT` (receivable) / `USD_CEILING_CALL` (payable) | Table above sensitivity grid | Executive at-a-glance |
-| Sensitivity table | USD proceeds / outlay for each strategy across `S_T_grid` ± 5% | Table on each tab | Core analytical evidence |
+| Sensitivity table | USD proceeds / outlay for each strategy across `S_T_grid` ± 5% | 	Sensitivity worksheet | Core analytical evidence |
 | Hedge-profit columns | `USD_k − USD_NO_HEDGE` for each strategy per row | Sub-table | Isolates hedge value-add |
 | Winner / best-hedge labels | `ARGMAX` / `ARGMIN` labels per row | Two label columns | Quick-read decision cue |
 | Sensitivity chart | Line chart of USD outcome vs. `S_T` for all four strategies | Embedded chart | Visual comparison |
 | Executive summary (Stage 5 decision memo) | 1–2 paragraph narrative with explicit recommendation | Separate memo | Downstream deliverable |
 
-### 5.1 Computed Base-Case Values
+### 8.1 Computed Base-Case Values
 
 Record the base-case outcome at `S_T = S0_in` once the model is built. This block serves as a regression checkpoint for the Stage 3 build and the Stage 4 repopulation.
 
@@ -274,77 +286,9 @@ Record the base-case outcome at `S_T = S0_in` once the model is built. This bloc
 
 ---
 
-## 6. Model Review — What Worked & What to Improve
-
-Record candidly what the model gets right and where it needs work. If you are writing this spec before the build, use the notes below as a known-risks register — these pitfalls are common in FX hedge models and are worth designing against from the start; if iterating after a first build, treat them as a review of what to fix.
-
-### 6.1 What Worked
-
-- [What the model gets right, and the cell or check that shows it.]
-
-### 6.2 What to Improve
-
-- [What to fix, and how. These notes become the improvement brief for the Stage 3 build.]
-
-### 6.3 Auditability Checklist
-
-- [ ] Every input has a standardized named range from §2.1
-- [ ] Every formula in §4 uses named ranges — no bare `$F$n` references
-- [ ] Money-market hedge ties to forward hedge within 0.05% (parity check)
-- [ ] Put payoff at `S_T = K_PUT` equals `K_PUT × FC_AMT + FV_PREM_PUT` (kink verification)
-- [ ] Sensitivity grid is symmetric around `S_T = S0_in` and driven by `STEP_FRAC`
-- [ ] Notes tab records spot / forward / rate sources with access dates
-- [ ] Cell colors match the legend: <span style="background:#FFFF00;">yellow</span> inputs, <span style="color:#0000FF;">blue</span> assumptions, black formulas, <span style="color:#024731;">green</span> cross-tab links
-
----
-
-## 7. Sensitivity Plan
-
-
-
----
-
-## 8. Limitations & Next Steps
-
-**Limitations.** This specification does not incorporate:
-- Partial / layered / dynamic hedging (treated as static, full-notional hedge at t₀)
-- Credit, counterparty, and settlement risk
-- Implied-volatility-based option pricing (premia are scenario inputs, not Black-Scholes outputs)
-- Accounting treatment (ASC 815 / IFRS 9 hedge accounting designation)
-- Multi-currency or multi-horizon portfolio effects
-
-**Next steps — later stages will:** (a) translate the sensitivity evidence into the Stage 5 decision memo to the CFO, (b) formalize the AI prompt using §4 as the instruction block and §6.2 as the improvement brief, and (c) implement at least one of the §6.2 improvements (default priority: standardized named ranges + chart).
-
----
-
-## 9. Writing a Strong Specification
-
-> <span style="color:#024731; font-weight:600;">The spec should read like a handoff document, not a lab notebook.</span>
-
-- **Communicate like a professional:** clear, structured, no filler.
-- **Think one stage ahead:** the spec feeds directly into the Stage 3 AI build prompt and the Stage 5 decision memo.
-- **Be internally consistent:** variables, labels, and steps must align with the actual workbook.
-- **Be reproducible:** another treasury analyst — or an AI — should be able to rebuild the model from this spec alone.
-- **Be reflective:** §6 should show honest assessment of the model's strengths and gaps, not self-congratulation.
-- **Be executive-relevant:** the CFO should understand *what was built* and *why it matters* for the hedging decision.
-
----
-
-## 10. How This Sets Up Stages 3–5
-
-| What's Written in Stage 2 | What It Enables in Stages 3–5 |
-|---------------------------|----------------------------|
-| Standardized named ranges with precise definitions | AI uses standardized variable names; no improvisation |
-| Step-by-step calculation flow | AI generates correct, auditable hedge formulas |
-| Model review and improvement notes (§6.2) | AI builds the *improved* version, not just a replica |
-| Explicit output requirements + chart spec | AI produces the exact tables, chart, and memo sections needed |
-| Base-case output values (§5.1) | Regression checkpoints for the refined model |
-
----
-
 ## Appendix A — Change Log
 
 | Version | Date | Author | Change |
-|---------|------|--------|--------|
-| 0.1 | [YYYY-MM-DD] | [name] | Initial draft |
-|  |  |  |  |
+|---|---|---|---|
+| 0.1 | 2026-11-06 | Siyan Zhu | Initial Stage 2 specification draft |
+| 0.2 | 2026-11-07 | Siyan Zhu | Reorganized sections, added validation rules, and clarified model assumptions |
