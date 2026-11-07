@@ -54,8 +54,7 @@ BRAND FORMATTING — applied per docs/_branding/design.json (v1.0.0)
 
 ## 1. Problem Statement
 
-A U.S.-based manufacturer of laboratory mass spectrometers is owed €5,100,000 by an Austrian research institute, with payment due in 182 days. Since the payment will be received in euros but converted into U.S. dollars, the company faces foreign exchange risk because the euro amount is fixed while the dollar value remains uncertain. For example, if the exchange rate drops from a hypothetical 1.20 to 1.10 USD per euro, the company's dollar receipts would decrease from $6,120,000 to $5,610,000, representing a loss of $510,000 (8.33%) that could negatively affect its budget and cash flow. This specification outlines the framework for comparing four strategies: no hedge, a forward contract, a money-market hedge, and a put option. By analyzing USD proceeds under different exchange-rate scenarios, the model will provide the sensitivity evidence needed to support the company's final hedging recommendation in Stage 5.
-
+A U.S.-based manufacturer of laboratory mass spectrometers expects to receive €5,100,000 from an Austrian research institute in 182 days. Since the payment is in euros, depreciation against the U.S. dollar could reduce its value and negatively affect the company's cash flow. For example, a hypothetical exchange-rate decline from 1.20 to 1.10 USD/EUR would decrease proceeds from $6,120,000 to $5,610,000, a loss of $510,000 (8.33%). This specification outlines a financial model comparing four strategies—no hedge, a forward contract, a money-market hedge, and a put option—to evaluate their USD proceeds under different exchange rates and support the Stage 5 hedging recommendation.
 ---
 
 ## 2. Inputs (Known Variables)
