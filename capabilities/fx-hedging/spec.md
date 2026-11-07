@@ -125,93 +125,80 @@ Only designated input cells will be manually edited. Calculation cells will use 
 
 ## 4. Assumptions & Constraints
 
-The FX hedging model uses the following assumptions and constraints:
+The model uses the following assumptions and constraints:
 
-1. **Settlement:** The Austrian research institute will pay the full EUR 5,100,000 receivable in 182 days, with no delays or defaults. The entire payment will be converted into USD.
+1. **Settlement:** The full EUR 5,100,000 receivable is collected in 182 days without delays or defaults and converted into USD.
 
-2. **Interest Rate Convention:** Both USD and EUR interest rates use simple annual interest with the ACT/360 convention (`BASIS = 360`). The rates remain constant throughout the 182-day period.
+2. **Interest Rates:** USD and EUR interest rates remain constant and use simple interest with ACT/360 (`BASIS = 360`).
 
-3. **Market Data:** The spot exchange rate, forward rate, and interest rates are indicative placeholders. Market inputs will be reviewed and updated using appropriate live quotes in Stage 4. Scenario-assigned transaction amounts, maturity, and option premiums remain fixed unless the assignment specifies otherwise.
+3. **Market Data:** Spot, forward, and interest rates and option strikes are indicative placeholders to be reviewed in Stage 4. Scenario-assigned amounts, maturity, and premiums remain fixed.
 
-4. **Transaction Costs:** Bank fees, bid-ask spreads, taxes, and other transaction costs are excluded to simplify the comparison. The model includes the stated option premiums.
+4. **Transaction Costs:** Bank fees, bid-ask spreads, taxes, and other transaction costs are excluded, except for the specified option premiums.
 
-5. **Option Premium Treatment:** The put premium is paid upfront and its cost is carried forward to settlement using the USD accumulation factor (`DF_USD`). The net option proceeds include this future-value cost. The EUR put protects the receivable from depreciation while allowing participation in favorable exchange-rate movements.
+5. **Option Premiums:** Put premiums are paid upfront and carried forward to settlement using `DF_USD`. Net put proceeds include this cost, providing downside protection while preserving potential upside.
 
-6. **Covered Interest Rate Parity:** The model calculates an implied forward rate using the USD and EUR interest rates and compares it with `F0_in`. Because the assigned forward rate and independently sourced placeholder rates may not satisfy parity, any discrepancy will be reported rather than automatically treated as a calculation error. Consistent market quotes will be reviewed in Stage 4.
+6. **Covered Interest Rate Parity:** The model compares the implied forward rate with `F0_in`. Because current placeholders are not parity-consistent, discrepancies are flagged and reviewed using consistent quotes in Stage 4.
 
-7. **Model Scope:** The model evaluates a single EUR receivable and compares no hedge, a forward hedge, a money-market hedge, and a put option hedge. Credit risk, changes in interest rates before settlement, and additional operational costs are excluded.
-
-The model also excludes dynamic hedging, volatility-based option pricing, formal hedge-accounting treatment, and multi-currency portfolio effects.
+7. **Model Scope:** The model compares no hedge, forward, money-market, and put-option strategies for one EUR receivable. Credit and settlement risk, dynamic hedging, volatility-based option pricing, hedge accounting, and multi-currency portfolio effects are excluded.
 
 ---
 
 ## 5. Calculation Flow
 
-Described in named-range pseudocode so the logic is portable across Excel, Python, and AI prompts. Formulas are written for a **receivable** exposure; Step 7 shows the sign flips required for a payable.
+All calculations use named ranges rather than cell references. The model evaluates USD proceeds from a EUR receivable.
 
-### Step 1 — Derived inputs
+### 5.1 Derived Inputs
 
-1. `DF_USD` = `1 + R_USD × T_DAYS / BASIS` *(accumulation / growth factor, not a fractional discount factor)*
-2. `DF_FC` = `1 + R_FC × T_DAYS / BASIS`
-3. `FV_PREM_PUT` = `−PREM_PUT × FC_AMT × DF_USD`
-4. `FV_PREM_CALL` = `−PREM_CALL × FC_AMT × DF_USD`
+Calculate `DF_USD`, `DF_FC`, `FV_PREM_PUT`, and `FV_PREM_CALL` using the formulas in Section 2.2. Interest uses ACT/360, and option premiums are carried forward to settlement.
 
-### Step 2 — Forward hedge (certainty benchmark)
+### 5.2 No Hedge and Forward Hedge
 
-- `USD_FWD` = `FC_AMT × F0_in`
-- Locked-in at t₀; invariant across the `S_T` grid.
+- `USD_NO_HEDGE(i) = FC_AMT * S_T(i)`
+- `USD_FWD = FC_AMT * F0_in`
 
-### Step 3 — Money-market hedge (parity check)
+Unhedged proceeds change with the settlement exchange rate, while forward proceeds remain fixed at $5,969,550 using the assigned forward placeholder.
 
-The money-market hedge consists of three separate calculations:
+### 5.3 Money-Market Hedge
 
-1. **Borrow EUR today:** `FC_BORROW = FC_AMT / DF_FC`. This determines the amount of EUR to borrow so that the receivable repays the loan and its interest at settlement.
-2. **Convert EUR into USD:** `USD_NOW = FC_BORROW * S0_in`. Convert the borrowed EUR into USD using the current spot exchange rate.
-3. **Invest USD until settlement:** `USD_MM = USD_NOW * DF_USD`. Invest the USD proceeds for 182 days using the USD interest rate.
+Calculate the following in three separate formula cells on the `Money Market` worksheet:
 
-Each calculation must appear as a separate formula cell on the `Money Market` worksheet. The EUR receivable will repay the EUR borrowing at maturity.
+1. **Borrow EUR:** `FC_BORROW = FC_AMT / DF_FC`
+2. **Convert to USD:** `USD_NOW = FC_BORROW * S0_in`
+3. **Invest USD:** `USD_MM = USD_NOW * DF_USD`
 
-**Covered Interest Rate Parity Check:**
+At maturity, the EUR receivable repays the EUR borrowing, while the USD investment represents the hedged proceeds.
+
+**Parity checks:**
 
 - `F_IMPLIED = S0_in * DF_USD / DF_FC`
 - `PARITY_GAP = F0_in - F_IMPLIED`
 - `USD_PARITY_GAP = USD_FWD - USD_MM`
 
-When spot, forward, and interest-rate inputs are consistent with covered interest rate parity, the forward and money-market hedges should produce approximately equal USD proceeds. Because the current placeholder inputs are not parity-consistent, the model must flag and report the discrepancy rather than incorrectly passing the validation check. The comparison will be reviewed using consistent market quotes in Stage 4.
+The workbook must report parity discrepancies rather than treating inconsistent placeholder quotes as formula errors.
 
-### Step 4 — Option hedge (floor with upside)
+### 5.4 Put Option Hedge
 
-Put-and-hold strategy on the receivable:
+The company purchases a EUR put at strike `K_PUT`. The upfront premium is `PREM_PUT * FC_AMT`, and its settlement-date cost is represented by the negative value `FV_PREM_PUT`.
 
-- Pay `PREM_PUT × FC_AMT` USD today for a put on FC with strike `K_PUT`.
-- At settlement, for each `S_T` on the grid:
-  - `USD_PUT(S_T)` = `S_T × FC_AMT` + `MAX(0, (K_PUT − S_T) × FC_AMT)` + `FV_PREM_PUT`
-  - Equivalently: `MAX(S_T, K_PUT) × FC_AMT + FV_PREM_PUT`
+- `USD_PUT(i) = MAX(S_T(i), K_PUT) * FC_AMT + FV_PREM_PUT`
 
-### Step 5 — Sensitivity table (rows of the grid)
+The put establishes a minimum net USD proceeds level while preserving upside when the euro appreciates.
 
-For each `S_T` in `S_T_grid`:
+### 5.5 Sensitivity and Summary Outputs
 
-| Column | Output | Formula |
-|--------|--------|---------|
-| No hedge | `USD_NO_HEDGE(i)` | `S_T(i) * FC_AMT` |
-| Forward | `USD_FWD` | constant across rows |
-| Money market | `USD_MM` | constant across rows |
-| Option (put) | `USD_PUT(i)` | `MAX(S_T(i), K_PUT) * FC_AMT + FV_PREM_PUT` |
-| Hedge profit | `HEDGE_PROFIT_k(S_T)` | `USD_k − USD_NO_HEDGE` for each of `k ∈ {forward, money market, option}` — one sub-column per strategy |
-| Overall winner (incl. no hedge) | label | `ARGMAX(USD_NO_HEDGE, USD_FWD, USD_MM, USD_PUT)` |
-| Best active hedge (excl. no hedge) | label | `ARGMAX(USD_FWD, USD_MM, USD_PUT)` |
+For each scenario `i = 0, 1, ..., 10`, calculate `USD_NO_HEDGE(i)`, `USD_FWD`, `USD_MM`, and `USD_PUT(i)`.
 
-### Step 6 — Summary metrics (scalar outputs)
+- `HEDGE_PROFIT_k(i) = USD_k(i) - USD_NO_HEDGE(i)` for each active hedge.
+- Overall winner: strategy with the highest USD proceeds, including no hedge.
+- Best active hedge: highest proceeds among forward, money-market, and put strategies.
+- `USD_BASE_k`: each strategy's proceeds at `S_T = S0_in`.
+- `USD_FLOOR_PUT = MIN(USD_PUT(i))` across the sensitivity grid.
 
-- `USD_FLOOR_PUT` = `MIN(USD_PUT)` across `S_T_grid` *(worst-case put outcome on the grid; payable tab uses `USD_CEILING_CALL = MAX(USD_CALL)` instead)*
-- `USD_BASE_k` = `USD_k` evaluated at `S_T = S0_in` for each strategy *(the "baseline" row feeds §8.1)*
+The full sensitivity grid and chart are specified in Section 6.
 
-*`HEDGE_PROFIT_k` is per-row and lives inside the Step 5 grid, not here.*
+### 5.6 Payable Variant (Reference Only)
 
-### Step 7 — Payable variant (sign flips)
-
-For a payable of `FC_AMT` to be settled in FC at maturity, the model mirrors Steps 2–5 with three substitutions: (a) **buy** the forward instead of sell, (b) **borrow USD today, invest in FC** for the money-market leg, and (c) use a **call on FC** with strike `K_CALL` and premium `PREM_CALL`. The sensitivity winner is the strategy that **minimizes** USD outlay at each `S_T`, not the one that maximizes it.
+For a EUR payable, the company would buy EUR forward, borrow USD and invest in EUR for the money-market hedge, or purchase a EUR call. The call's net USD outlay is `FC_AMT * MIN(S_T(i), K_CALL) - FV_PREM_CALL`. The preferred strategy minimizes USD outlay. Scenario 9 models a receivable, so the payable variant is not part of the four-strategy comparison.
 
 ---
 
