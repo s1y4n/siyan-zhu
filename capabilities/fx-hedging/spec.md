@@ -44,7 +44,7 @@ BRAND FORMATTING — applied per docs/_branding/design.json (v1.0.0)
 | **Updated by** | Siyan Zhu |
 | **Date Created** | 2026-11-06 |
 | **Date Updated** | 2026-11-06 |
-| **Version** | 0.1 |
+| **Version** | 0.2|
 | **LLM Used** (optional) | ChatGPT — specification review and feedback |
 | **Role** | Treasury Analyst / FP&A Analyst |
 | **Audience** | CFO / Director of Treasury |
@@ -78,37 +78,15 @@ All inputs are defined as workbook named ranges so Calculation Flow (§5) can be
 | `T_DAYS` | Days to settlement | 182 | Days | Scenario 9 (fixed) |
 | `BASIS` | Day-count denominator | 360 | Days | ACT/360 assumption |
 
-**S0_in Source:** European Central Bank (ECB),
-Euro Foreign Exchange Reference Rates,
-November 6, 2026. EUR 1 = USD 1.1165.
+**Market Data Sources and Assumptions:**
 
-This is an indicative daily reference rate
-that will be updated during Stage 4.
+- **`S0_in` (1.1165 USD/EUR):** European Central Bank, November 6, 2026. Indicative daily reference rate, not a market-close quote. [ECB Exchange Rates](https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/eurofxref-graph-usd.en.html)
+- **`R_USD` (4.19%):** Federal Reserve H.15 / FRED, six-month Treasury yield, November 5, 2026. Used as an indicative USD investment-rate proxy. [FRED DGS6MO](https://fred.stlouisfed.org/series/DGS6MO/)
+- **`R_FC` (3.014%):** Bank of Finland, six-month Euribor, November 5, 2026. Used as an indicative EUR borrowing-rate benchmark. [Euribor Rates](https://www.suomenpankki.fi/en/statistics/interest-rates-and-exchange_rates/euribor-rates/)
+- **Option Strikes:** `K_PUT` and `K_CALL` equal `S0_in` (1.1165 USD/EUR), making both options at-the-money.
+- **Parity:** The assigned forward rate (`F0_in = 1.1705`) differs from the rate implied by the spot and interest-rate placeholders. The discrepancy is reported in Section 7.
 
-https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/eurofxref-graph-usd.en.html
-
-**R_USD Source:** Federal Reserve Board, H.15
-Selected Interest Rates, via FRED (DGS6MO).
-The six-month U.S. Treasury constant-maturity
-yield was 4.19% on November 5, 2026.
-
-This rate serves as an indicative proxy for
-the company's six-month USD investment rate.
-The model assumes simple interest using
-ACT/360. The rate will be updated with
-appropriate market data in Stage 4.
-
-https://fred.stlouisfed.org/series/DGS6MO/
-
-**R_FC Source:** Bank of Finland, Euribor Rates. The six-month Euribor rate was 3.014% on November 5, 2026.
-
-This rate serves as an indicative benchmark for the company's six-month EUR borrowing rate. It uses the ACT/360 convention and will be replaced with an appropriate borrowing quote during Stage 4.
-
-https://www.suomenpankki.fi/en/statistics/interest-rates-and-exchange-rates/euribor-rates/
-
-**K_PUT and K_CALL Assumptions:** Both option strike prices are set equal to the indicative spot rate (S0_in = 1.1165 USD/EUR), making them at-the-money. This follows the Scenario 9 instructions. The strikes will be reviewed when the spot rate is updated in Stage 4. The put option is used to hedge the company's EUR receivable; the call input is retained for the standardized model and potential payable scenarios.
-
-**Covered Interest Rate Parity Note:** The scenario-assigned forward rate (F0_in = 1.1705) may differ from the forward rate implied by the independently sourced spot and interest-rate placeholders. This difference will be documented in the model's parity validation check. Consistent market quotes will be reviewed during Stage 4 before applying a strict parity tolerance.
+Market placeholders will be reviewed in Stage 4. The `Notes & Assumptions` worksheet will record data sources and access dates.
 
 ### 2.2 Derived / Intermediate Values
 
@@ -266,7 +244,7 @@ The completed workbook must pass the following checks before its results are use
 | Output | Description | Format | Purpose |
 |--------|-------------|--------|---------|
 | Input panel | All named-range inputs with units, sources, and access dates | Inputs worksheet | Single source of truth |
-| Strategy summary | `USD_FWD`, `USD_MM`, `USD_BASE_k` per strategy, plus `USD_FLOOR_PUT` (receivable) / `USD_CEILING_CALL` (payable) | Table above sensitivity grid | Executive at-a-glance |
+| Strategy summary | `USD_FWD`, `USD_MM`, `USD_BASE_k` per strategy, plus `USD_FLOOR_PUT` (receivable) / `USD_CEILING_CALL` (payable) | Cover summary and linked table above Sensitivity grid | Executive at-a-glance |
 | Sensitivity table | USD proceeds / outlay for each strategy across `S_T_grid` ± 5% | 	Sensitivity worksheet | Core analytical evidence |
 | Hedge-profit columns | `USD_k − USD_NO_HEDGE` for each strategy per row | Sub-table | Isolates hedge value-add |
 | Winner / best-hedge labels | `ARGMAX` / `ARGMIN` labels per row | Two label columns | Quick-read decision cue |
