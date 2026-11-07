@@ -59,7 +59,7 @@ A U.S.-based manufacturer of laboratory mass spectrometers expects to receive โ
 
 ## 2. Inputs (Known Variables)
 
-All inputs are defined as workbook named ranges so Calculation Flow (ยง5) can be implemented consistently in Excel or by AI. Data sources and access dates will be recorded in the `Notes & Assumptions` worksheet. Market placeholders, including spot and forward rates, interest rates, and option strikes, will be reviewed in Stage 4. Scenario-assigned amounts, maturity, and option premiums remain fixed.
+All inputs use standardized named ranges for the calculations in Section 5. Market placeholders will be updated in Stage 4, while scenario-assigned values remain fixed. Sources and access dates will be documented in the `Notes & Assumptions` worksheet.
 
 ### 2.1 Core Inputs
 
@@ -104,7 +104,7 @@ Market placeholders will be reviewed in Stage 4. The `Notes & Assumptions` works
 
 ## 3. Tab Architecture
 
-The Excel workbook will contain nine worksheets to organize the inputs, hedge calculations, sensitivity analysis, and documentation. Each hedge calculation will be separated so the model can be reviewed and audited easily.
+The workbook will contain nine worksheets separating inputs, hedge calculations, sensitivity analysis, and documentation for transparency and auditability.
 
 | Worksheet | Purpose |
 |---|---|
@@ -118,7 +118,7 @@ The Excel workbook will contain nine worksheets to organize the inputs, hedge ca
 | `Sensitivity` | Compares all four strategies across 11 settlement exchange-rate scenarios and includes a line chart. |
 | `Notes & Assumptions` | Records market-data sources, dates, calculation conventions, limitations, and validation notes. |
 
-Only designated input cells will be manually edited. Calculation cells will use formulas referencing the standardized named ranges. The Cover and Sensitivity worksheets will display linked results rather than hardcoded values.
+Only designated input cells are editable. All calculated results, including the Cover summary and Sensitivity table, will use formulas and linked named ranges.
 
 ---
 
