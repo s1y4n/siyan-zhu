@@ -125,23 +125,47 @@ https://www.suomenpankki.fi/en/statistics/interest-rates-and-exchange-rates/euri
 
 ---
 
-## 3. Assumptions & Constraints
+## 3. Tab Architecture
 
-State every convention used. Clarity here is what makes the model reproducible.
+The Excel workbook will contain nine worksheets to organize the inputs, hedge calculations, sensitivity analysis, and documentation. Each hedge calculation will be separated so the model can be reviewed and audited easily.
 
-- **Quote convention:** All rates expressed as **USD per unit of foreign currency** (e.g., USD/GBP, USD/EUR). A higher quote means FC appreciation.
-- **Horizon:** Single-maturity model; `T_DAYS = 365` unless otherwise noted. Templates assume a 1-year tenor.
-- **Day-count basis:** The default 1-year tenor uses the textbook simplified-annual form `(1 + r)` for both USD and FC legs. The general form is `r × T_DAYS / BASIS`, with `BASIS = 360` for USD and EUR money-market quotes (ACT/360) and `BASIS = 365` for GBP money-market quotes (ACT/365). The template exposes a **single `BASIS`** named range (simplification). A rigorous build should split it into `BASIS_USD` and `BASIS_FC` so each leg applies its own convention. Record it in §6.2.
-- **Parity:** Money-market hedge is assumed to replicate the forward hedge under covered interest-rate parity; any gap is a test of parity, not a model error.
-- **Option premium:** Paid upfront in USD, quoted per 1 unit of FC (no contract multiplier). Premia are expressed as a **negative cash flow** at t₀ and carried forward at `R_USD` to put them on the same footing as the settlement-date USD proceeds.
-- **Counterparty / credit risk:** Excluded. All derivatives assumed frictionless and creditworthy.
-- **Transaction costs & bid-ask spreads:** Excluded from the base case. Flagged as a sensitivity candidate in §6.
-- **Tax / accounting treatment:** Excluded. Model reports pre-tax cash outcomes only.
-- **Scenario construction:** Future spot `S_T` is varied deterministically across a grid; no probability weights and no implied-volatility distribution are applied.
+| Worksheet | Purpose |
+|---|---|
+| `Cover` | Introduces Scenario 9, the EUR 5,100,000 receivable, and summarizes the USD proceeds for each strategy. |
+| `Legend` | Explains the workbook's color coding, named ranges, units, and abbreviations. |
+| `Inputs` | Contains all standardized inputs, including exchange rates, interest rates, option strikes, premiums, and settlement days. |
+| `No Hedge` | Calculates the USD proceeds if the company leaves its EUR receivable unhedged. |
+| `Forward` | Calculates the fixed USD proceeds using the forward exchange rate. |
+| `Money Market` | Shows the three steps of borrowing EUR, converting to USD, and investing USD until settlement. |
+| `Put Option` | Calculates the net USD proceeds from using a EUR put option, including the premium's future value. |
+| `Sensitivity` | Compares all four strategies across 11 settlement exchange-rate scenarios and includes a line chart. |
+| `Notes & Assumptions` | Records market-data sources, dates, calculation conventions, limitations, and validation notes. |
+
+Only designated input cells will be manually edited. Calculation cells will use formulas referencing the standardized named ranges. The Cover and Sensitivity worksheets will display linked results rather than hardcoded values.
 
 ---
 
-## 4. Calculation Flow
+## 4. Assumptions & Constraints
+
+The FX hedging model uses the following assumptions and constraints:
+
+1. **Settlement:** The Austrian research institute will pay the full EUR 5,100,000 receivable in 182 days, with no delays or defaults. The entire payment will be converted into USD.
+
+2. **Interest Rate Convention:** Both USD and EUR interest rates use simple annual interest with the ACT/360 convention (`BASIS = 360`). The rates remain constant throughout the 182-day period.
+
+3. **Market Data:** The spot exchange rate, forward rate, and interest rates are indicative placeholders. Market inputs will be reviewed and updated using appropriate live quotes in Stage 4. Scenario-assigned transaction amounts, maturity, and option premiums remain fixed unless the assignment specifies otherwise.
+
+4. **Transaction Costs:** Bank fees, bid-ask spreads, taxes, and other transaction costs are excluded to simplify the comparison. The model includes the stated option premiums.
+
+5. **Option Premium Treatment:** The put premium is paid upfront and its cost is carried forward to settlement using the USD accumulation factor (`DF_USD`). The net option proceeds include this future-value cost. The EUR put protects the receivable from depreciation while allowing participation in favorable exchange-rate movements.
+
+6. **Covered Interest Rate Parity:** The model calculates an implied forward rate using the USD and EUR interest rates and compares it with `F0_in`. Because the assigned forward rate and independently sourced placeholder rates may not satisfy parity, any discrepancy will be reported rather than automatically treated as a calculation error. Consistent market quotes will be reviewed in Stage 4.
+
+7. **Model Scope:** The model evaluates a single EUR receivable and compares no hedge, a forward hedge, a money-market hedge, and a put option hedge. Credit risk, changes in interest rates before settlement, and additional operational costs are excluded.
+
+---
+
+## 5. Calculation Flow
 
 Described in named-range pseudocode so the logic is portable across Excel, Python, and AI prompts. Formulas are written for a **receivable** exposure; Step 7 shows the sign flips required for a payable.
 
@@ -159,12 +183,21 @@ Described in named-range pseudocode so the logic is portable across Excel, Pytho
 
 ### Step 3 — Money-market hedge (parity check)
 
-1. Borrow `FC_AMT / DF_FC` foreign currency today *(the discounted PV of the receivable)*.
-2. Convert to USD at the spot rate: `(FC_AMT / DF_FC) × S0_in`.
-3. Invest the USD to maturity: `USD_MM` = `(FC_AMT / DF_FC) × S0_in × DF_USD`.
-4. At maturity, the FC receivable repays the foreign borrowing exactly — so the USD deposit is the locked-in proceed.
+The money-market hedge consists of three separate calculations:
 
-> **Parity check:** `USD_MM ≈ USD_FWD` within rounding. A persistent gap indicates a violation of covered interest-rate parity in the quoted inputs.
+1. **Borrow EUR today:** `FC_BORROW = FC_AMT / DF_FC`. This determines the amount of EUR to borrow so that the receivable repays the loan and its interest at settlement.
+2. **Convert EUR into USD:** `USD_NOW = FC_BORROW * S0_in`. Convert the borrowed EUR into USD using the current spot exchange rate.
+3. **Invest USD until settlement:** `USD_MM = USD_NOW * DF_USD`. Invest the USD proceeds for 182 days using the USD interest rate.
+
+Each calculation must appear as a separate formula cell on the `Money Market` worksheet. The EUR receivable will repay the EUR borrowing at maturity.
+
+**Covered Interest Rate Parity Check:**
+
+- `F_IMPLIED = S0_in * DF_USD / DF_FC`
+- `PARITY_GAP = F0_in - F_IMPLIED`
+- `USD_PARITY_GAP = USD_FWD - USD_MM`
+
+When spot, forward, and interest-rate inputs are consistent with covered interest rate parity, the forward and money-market hedges should produce approximately equal USD proceeds. Because the current placeholder inputs are not parity-consistent, the model must flag and report the discrepancy rather than incorrectly passing the validation check. The comparison will be reviewed using consistent market quotes in Stage 4.
 
 ### Step 4 — Option hedge (floor with upside)
 
@@ -181,10 +214,10 @@ For each `S_T` in `S_T_grid`:
 
 | Column | Output | Formula |
 |--------|--------|---------|
-| No hedge | `USD_NO_HEDGE(S_T)` | `S_T × FC_AMT` |
+| No hedge | `USD_NO_HEDGE(i)` | `S_T(i) * FC_AMT` |
 | Forward | `USD_FWD` | constant across rows |
 | Money market | `USD_MM` | constant across rows |
-| Option (put) | `USD_PUT(S_T)` | `MAX(S_T, K_PUT) × FC_AMT + FV_PREM_PUT` |
+| Option (put) | `USD_PUT(i)` | `MAX(S_T(i), K_PUT) * FC_AMT + FV_PREM_PUT` |
 | Hedge profit | `HEDGE_PROFIT_k(S_T)` | `USD_k − USD_NO_HEDGE` for each of `k ∈ {forward, money market, option}` — one sub-column per strategy |
 | Overall winner (incl. no hedge) | label | `ARGMAX(USD_NO_HEDGE, USD_FWD, USD_MM, USD_PUT)` |
 | Best active hedge (excl. no hedge) | label | `ARGMAX(USD_FWD, USD_MM, USD_PUT)` |
@@ -202,7 +235,21 @@ For a payable of `FC_AMT` to be settled in FC at maturity, the model mirrors Ste
 
 ---
 
-## 5. Outputs
+## 6. Sensitivity Plan
+
+- **Grid:** `S_T_grid` spans `S0_in × (1 ± 5%)` in 1% increments → 11 rows (including the baseline).
+- **Strategies plotted:** no hedge, forward, money market, option (put for receivable / call for payable).
+- **Primary chart:** line chart with `S_T` on the x-axis and USD proceeds (or outlay) on the y-axis. Forward and money-market series are horizontal by construction; no-hedge is a straight line through the origin; option is piecewise-linear with a kink at the strike.
+- **Secondary table:** hedge profit vs. no hedge for each strategy, to make the visual intuition numeric.
+- **What the chart should communicate:** the trade-off between **certainty** (forward / money-market, flat lines), **optionality** (put / call, kinked payoff), and **naked exposure** (no hedge, unbounded on both sides).
+
+---
+
+## 7. Validation Rules
+
+---
+
+## 8. Outputs
 
 | Output | Description | Format | Purpose |
 |--------|-------------|--------|---------|
@@ -253,11 +300,7 @@ Record candidly what the model gets right and where it needs work. If you are wr
 
 ## 7. Sensitivity Plan
 
-- **Grid:** `S_T_grid` spans `S0_in × (1 ± 5%)` in 1% increments → 11 rows (including the baseline).
-- **Strategies plotted:** no hedge, forward, money market, option (put for receivable / call for payable).
-- **Primary chart:** line chart with `S_T` on the x-axis and USD proceeds (or outlay) on the y-axis. Forward and money-market series are horizontal by construction; no-hedge is a straight line through the origin; option is piecewise-linear with a kink at the strike.
-- **Secondary table:** hedge profit vs. no hedge for each strategy, to make the visual intuition numeric.
-- **What the chart should communicate:** the trade-off between **certainty** (forward / money-market, flat lines), **optionality** (put / call, kinked payoff), and **naked exposure** (no hedge, unbounded on both sides).
+
 
 ---
 
