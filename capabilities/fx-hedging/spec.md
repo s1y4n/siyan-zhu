@@ -1,60 +1,17 @@
-<div style="border-top: 6px solid #024731; border-bottom: 1px solid #B2B2B2; padding: 12px 0; margin-bottom: 24px; font-family: 'Open Sans', Helvetica, Arial, sans-serif;">
-  <div style="color: #024731; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; font-size: 0.85rem;">University of Hawaiʻi at Mānoa · Shidler College of Business</div>
-  <div style="color: #000000; font-weight: 700; font-size: 1.25rem; margin-top: 4px;">FIN 321: International Finance and Securities</div>
-  <div style="color: #525252; font-weight: 400; font-size: 0.95rem;">FX Transaction Hedging Project — Technical Specification</div>
-</div>
+# FX Hedging — Scenario 9: Technical Specification
 
-<!--
-BRAND FORMATTING — applied per docs/_branding/design.json (v1.0.0)
-  ┌─ Colors ─────────────────────────────────────────────────────────────┐
-  │ Primary green ........... #024731  RGB 2,71,49    Pantone 3435 C     │
-  │ Primary black ........... #000000  RGB 0,0,0      Process Black      │
-  │ Silver (secondary) ...... #B2B2B2  RGB 178,178,178 Cool Gray 5 C     │
-  │ White (secondary) ....... #FFFFFF                                    │
-  │ Neutral-600 (muted) ..... #525252  (secondary text, captions)        │
-  │ UH-green 700 (hover) .... #013D26  (link hover, pressed state)       │
-  │ UH-green 50 (tint) ...... #E6F2EF  (callout backgrounds)             │
-  │ Yellow (Excel only) ..... #FFFF00  (input highlight — not brand)     │
-  ├─ Typography ─────────────────────────────────────────────────────────┤
-  │ Headings (web)  .......... Open Sans Bold (H1/H2) / Semibold (H3/H4) │
-  │ Headings (print)  ........ Avenir Bold                               │
-  │ Body (web)  .............. Open Sans Regular                         │
-  │ Body (print)  ............ Avenir Book                               │
-  │ Fallback stack  .......... Helvetica, Arial, sans-serif              │
-  │ Monospace  ............... Consolas / ui-monospace                   │
-  │ Body minimum size  ....... 10 pt (11–12 pt preferred for print)      │
-  │ Leading  ................. 3–5 pt greater than type size (print)     │
-  │ Alignment  ............... Flush left, ragged right                  │
-  ├─ Accessibility ──────────────────────────────────────────────────────┤
-  │ • ADA-compliant contrast ratios for ALL text and UI elements         │
-  │ • No red body type                                                   │
-  │ • No layouts that are too dark for readability                       │
-  │ • No custom palettes or gradients outside the official brand         │
-  └──────────────────────────────────────────────────────────────────────┘
-  Full brand standard: docs/_branding/design.json · Source: https://manoa.hawaii.edu/brand/
--->
+**University of Hawaiʻi at Mānoa | FIN 321**
 
-# U.S. Laboratory Instruments Manufacturer (Scenario 9) — FX Transaction Hedge Model · Technical Specification
+**Version:** 0.4 | **Updated:** 2026-11-08
 
-> <span style="color:#024731; font-weight:700;">Technical specification</span> for the FX transaction hedge model — the named-range contract, calculation flow, and validation checks, precise enough that an AI or a colleague could build (or rebuild) the workbook from this document alone. This spec is the input the AI-assisted build works from.
-
-| Field | Value |
-|------|------|
-| **Created by** | Siyan Zhu |
-| **Updated by** | Siyan Zhu |
-| **Date Created** | 2026-11-06 |
-| **Date Updated** | 2026-11-07 |
-| **Version** | 0.3|
-| **LLM Used** (optional) | ChatGPT — specification review and feedback |
-| **Role** | Treasury Analyst / FP&A Analyst |
-| **Audience** | CFO / Director of Treasury |
-| **Companion Workbook** | 	model.xlsx (planned for Stage 3)|
+**Scenario:** €5,100,000 EUR receivable due in 182 days.
+**Workbook:** `model.xlsx` (planned for Stage 3)
 
 ---
 
 ## 1. Problem Statement
 
-A U.S.-based manufacturer of laboratory mass spectrometers expects to receive €5,100,000 from an Austrian research institute in 182 days. Since the payment is in euros, depreciation against the U.S. dollar could reduce its value and negatively affect the company's cash flow. For example, a hypothetical exchange-rate decline from 1.20 to 1.10 USD/EUR would decrease proceeds from $6,120,000 to $5,610,000, a loss of $510,000 (8.33%). This specification outlines a financial model comparing four strategies—no hedge, a forward contract, a money-market hedge, and a put option—to evaluate their USD proceeds under different exchange rates and support the Stage 5 hedging recommendation.
+A U.S. laboratory instruments manufacturer expects €5,100,000 from an Austrian institute in 182 days (assumed settlement: May 7, 2027). Euro depreciation could reduce USD receipts; for example, a decline from 1.20 to 1.10 USD/EUR would cause a $510,000 (8.33%) loss. The model compares no hedge, forward, money-market, and put-option strategies to evaluate USD proceeds and support a hedging recommendation.
 ---
 
 ## 2. Inputs (Known Variables)
@@ -66,12 +23,12 @@ All inputs use standardized named ranges for the calculations in Section 5. Mark
 | Named Range | Description | Placeholder Value | Unit | Stage 4 Source |
 |---|---|---|---|---|
 | `FC_AMT` | EUR receivable | 5,100,000 | EUR | Scenario 9 (fixed) |
-| `S0_in` | EUR/USD spot rate | 1.1165 (indicative) | USD/EUR | ECB, Nov. 6, 2026 |
+| `S0_in` | EUR/USD spot rate | 1.1144 (indicative) | USD/EUR | Investing.com daily close, Nov. 6, 2026 |
 | `F0_in` | 182-day forward rate | 1.1705 (indicative) | USD/EUR | Live forward quote or CIP-implied rate |
 | `R_USD` | Annual USD interest rate | 4.19% (indicative) | Annual % | Federal Reserve H.15 / FRED DGS6MO, Nov. 5, 2026 |
 | `R_FC` | Annual EUR interest rate | 3.014% (indicative) | Annual % | Bank of Finland, 6-month Euribor, Nov. 5, 2026 |
-| `K_PUT` | Put option strike | 1.1165 (indicative) | USD/EUR | Set equal to S0_in (ECB spot-rate placeholder) |
-| `K_CALL` | Call option strike | 1.1165 (indicative) | USD/EUR | Set equal to S0_in (ECB spot-rate placeholder) |
+| `K_PUT` | Put option strike | 1.1144 (indicative) | USD/EUR | Set equal to S0_in (at-the-money assumption) |
+| `K_CALL` | Call option strike | 1.1144 (indicative) | USD/EUR | Set equal to S0_in (at-the-money assumption) |
 | `PREM_PUT` | Put premium per EUR | 0.0194 | USD/EUR | Scenario 9 (fixed) |
 | `PREM_CALL` | Call premium per EUR | 0.0296 | USD/EUR | Scenario 9 (fixed) |
 | `T_DAYS` | Days to settlement | 182 | Days | Scenario 9 (fixed) |
@@ -79,46 +36,25 @@ All inputs use standardized named ranges for the calculations in Section 5. Mark
 
 **Market Data Sources and Assumptions:**
 
-- **`S0_in` (1.1165 USD/EUR):** European Central Bank, November 6, 2026. Indicative daily reference rate, not a market-close quote. [ECB Exchange Rates](https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/eurofxref-graph-usd.en.html)
+- **`S0_in` (1.1144 USD/EUR):** Investing.com, EUR/USD Historical Data, November 6, 2026. Indicative daily closing quote. [EUR/USD Historical Data](https://www.investing.com/currencies/eur-usd-historical-data)
 - **`R_USD` (4.19%):** Federal Reserve H.15 / FRED, six-month Treasury yield, November 5, 2026. Used as an indicative USD investment-rate proxy. [FRED DGS6MO](https://fred.stlouisfed.org/series/DGS6MO/)
 - **`R_FC` (3.014%):** Bank of Finland, six-month Euribor, November 5, 2026. Used as an indicative EUR borrowing-rate benchmark. [Euribor Rates](https://www.suomenpankki.fi/en/statistics/interest-rates-and-exchange-rates/euribor-rates/)
-- **Option Strikes:** `K_PUT` and `K_CALL` equal `S0_in` (1.1165 USD/EUR), making both options at-the-money.
+- **Option Strikes:** `K_PUT` and `K_CALL` equal `S0_in` (1.1144 USD/EUR), making both options at-the-money.
 - **Parity:** The assigned forward rate (`F0_in = 1.1705`) differs from the rate implied by the spot and interest-rate placeholders. The discrepancy is reported in Section 7.
 
-Market placeholders will be reviewed in Stage 4. The `Notes & Assumptions` worksheet will record data sources and access dates.
-
-### 2.2 Derived / Intermediate Values
-
-| Name | Description | Formula / Source |
-|---|---|---|
-| `DF_USD` | USD accumulation factor | `1 + R_USD * T_DAYS / BASIS` |
-| `DF_FC` | EUR accumulation factor | `1 + R_FC * T_DAYS / BASIS` |
-| `FV_PREM_PUT` | Future value of put premium at settlement | `-PREM_PUT * FC_AMT * DF_USD` |
-| `FV_PREM_CALL` | Future value of call premium at settlement | `-PREM_CALL * FC_AMT * DF_USD` |
-| `S_T_grid` | Settlement exchange-rate sensitivity grid | `S_T(i) = S0_in * (0.95 + 0.01 * i), where i = 0, 1, ..., 10` |
-| `USD_NO_HEDGE` | USD proceeds without hedging |USD_NO_HEDGE(i) = S_T(i) * FC_AMT|
-
-**Day-count convention:** `BASIS = 360` for both USD and EUR (ACT/360).
-
 ---
-
 ## 3. Tab Architecture
 
-The workbook will contain nine worksheets separating inputs, hedge calculations, sensitivity analysis, and documentation for transparency and auditability.
+The Stage 3 workbook will contain nine worksheets:
 
-| Worksheet | Purpose |
-|---|---|
-| `Cover` | Introduces Scenario 9, the EUR 5,100,000 receivable, and summarizes the USD proceeds for each strategy. |
-| `Legend` | Explains the workbook's color coding, named ranges, units, and abbreviations. |
-| `Inputs` | Contains all standardized inputs, including exchange rates, interest rates, option strikes, premiums, and settlement days. |
-| `No Hedge` | Calculates the USD proceeds if the company leaves its EUR receivable unhedged. |
-| `Forward` | Calculates the fixed USD proceeds using the forward exchange rate. |
-| `Money Market` | Shows the three steps of borrowing EUR, converting to USD, and investing USD until settlement. |
-| `Put Option` | Calculates the net USD proceeds from using a EUR put option, including the premium's future value. |
-| `Sensitivity` | Compares all four strategies across 11 settlement exchange-rate scenarios and includes a line chart. |
-| `Notes & Assumptions` | Records market-data sources, dates, calculation conventions, limitations, and validation notes. |
+- `Cover` — Scenario 9 overview and linked strategy summary.
+- `Legend` — Colors, named ranges, units, and abbreviations.
+- `Inputs` — Editable input values, units, and source references.
+- `No Hedge`, `Forward`, `Money Market`, `Put Option` — Separate formula-driven hedge calculations; money-market borrowing, conversion, and investment appear in three distinct cells.
+- `Sensitivity` — Eleven FX scenarios, proceeds, hedge profits, winner labels, and comparison chart.
+- `Notes & Assumptions` — Market sources, dates, conventions, limitations, and validation notes.
 
-Only designated input cells are editable. All calculated results, including the Cover summary and Sensitivity table, will use formulas and linked named ranges.
+Only designated input cells are editable; all other outputs are formula-linked.
 
 ---
 
@@ -148,7 +84,14 @@ All calculations use named ranges rather than cell references. The model evaluat
 
 ### 5.1 Derived Inputs
 
-Calculate `DF_USD`, `DF_FC`, `FV_PREM_PUT`, and `FV_PREM_CALL` using the formulas in Section 2.2. Interest uses ACT/360, and option premiums are carried forward to settlement.
+- `DF_USD = 1 + R_USD * T_DAYS / BASIS`
+- `DF_FC = 1 + R_FC * T_DAYS / BASIS`
+- `FV_PREM_PUT = -PREM_PUT * FC_AMT * DF_USD`
+- `FV_PREM_CALL = -PREM_CALL * FC_AMT * DF_USD`
+- `S_T(i) = S0_in * (0.95 + 0.01 * i)`, for `i = 0, 1, ..., 10` (`S_T_grid`)
+- `USD_NO_HEDGE(i) = S_T(i) * FC_AMT`
+
+Interest and premium calculations use ACT/360 (`BASIS = 360`).
 
 ### 5.2 No Hedge and Forward Hedge
 
@@ -220,8 +163,8 @@ The Stage 3 workbook must satisfy these checks:
 
 - [ ] **Named Ranges:** All ten required names from Section 2.1 are defined; calculated outputs use formulas rather than hardcoded values.
 - [ ] **Forward Hedge:** `USD_FWD = FC_AMT * F0_in` must equal $5,969,550 using the initial placeholders and remain constant across all scenarios.
-- [ ] **Money-Market Hedge:** Verify `FC_BORROW * DF_FC = FC_AMT`, `USD_NOW = FC_BORROW * S0_in`, and `USD_MM = USD_NOW * DF_USD` in three separate calculation cells. Expected initial `USD_MM` is approximately $5,727,495.52.
-- [ ] **Interest Rate Parity:** Verify `F_IMPLIED = S0_in * DF_USD / DF_FC`. The parity check passes when `ABS(F0_in - F_IMPLIED) / F_IMPLIED <= 0.0005` (0.05%). The initial placeholders imply approximately 1.123038 USD/EUR, so this check must flag an input mismatch, not pass.
+- [ ] **Money-Market Hedge:** Verify `FC_BORROW * DF_FC = FC_AMT`, `USD_NOW = FC_BORROW * S0_in`, and `USD_MM = USD_NOW * DF_USD` in three separate calculation cells. Expected initial USD_MM is approximately $5,716,722.80.
+- [ ] **Interest Rate Parity:** Verify `F_IMPLIED = S0_in * DF_USD / DF_FC`. The parity check passes when `ABS(F0_in - F_IMPLIED) / F_IMPLIED <= 0.0005` (0.05%). The initial placeholders imply approximately 1.120926 USD/EUR, so this check must flag an input mismatch, not pass.
 - [ ] **Put Option:** At `S_T = K_PUT`, verify `USD_PUT = K_PUT * FC_AMT + FV_PREM_PUT`. Proceeds must stay at the net floor below the strike and increase above it.
 - [ ] **Sensitivity:** Generate exactly 11 scenarios from `0.95 * S0_in` to `1.05 * S0_in` in 1% steps. Include the baseline and verify that forward and money-market proceeds remain constant.
 - [ ] **Workbook Integrity:** No formula errors (`#REF!`, `#VALUE!`, `#DIV/0!`); calculated outputs are formula-driven. The `Notes & Assumptions` worksheet records sources and access dates. The Legend defines yellow inputs, blue assumptions, black formulas, and green cross-tab links.
@@ -262,3 +205,4 @@ The base case uses `S_T = S0_in`. The following results will be populated and ve
 | 0.1 | 2026-11-06 | Siyan Zhu | Initial Stage 2 specification draft |
 | 0.2 | 2026-11-07 | Siyan Zhu | Reorganized sections, added validation rules, and clarified model assumptions |
 | 0.3 | 2026-11-07 | Siyan Zhu | Refined model specification following AI review and documented validation improvements |
+| 0.4 | 2026-11-08 | Siyan Zhu | Updated spot-rate placeholder, option strikes, source documentation, and validation checkpoints |
