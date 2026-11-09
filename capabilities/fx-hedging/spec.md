@@ -1,168 +1,83 @@
+
 # FX Hedging — Scenario 9: Technical Specification
 
-**University of Hawaiʻi at Mānoa | FIN 321**
-
-**Version:** 0.4 | **Updated:** 2026-11-08
-
-**Scenario:** €5,100,000 EUR receivable due in 182 days.
-**Workbook:** `model.xlsx` (planned for Stage 3)
-
----
+**University of Hawaiʻi at Mānoa | FIN 321 | Version 0.4 | November 8, 2026**
 
 ## 1. Problem Statement
 
-A U.S. laboratory instruments manufacturer expects €5,100,000 from an Austrian institute in 182 days (assumed settlement: May 7, 2027). Euro depreciation could reduce USD receipts; for example, a decline from 1.20 to 1.10 USD/EUR would cause a $510,000 (8.33%) loss. The model compares no hedge, forward, money-market, and put-option strategies to evaluate USD proceeds and support a hedging recommendation.
----
+A U.S. laboratory instruments manufacturer expects €5,100,000 from an Austrian research institute in 182 days (assumed valuation: Nov. 6, 2026; settlement: May 7, 2027). EUR depreciation creates uncertain USD proceeds: a decline from 1.20 to 1.10 USD/EUR would reduce receipts by $510,000 (8.33%). The model compares no hedge, forward, money-market, and EUR put strategies to support a treasury recommendation.
 
 ## 2. Inputs (Known Variables)
 
-All inputs use standardized named ranges for the calculations in Section 5. Market placeholders will be updated in Stage 4, while scenario-assigned values remain fixed. Sources and access dates will be documented in the `Notes & Assumptions` worksheet.
+All inputs are Excel named ranges. Market values are indicative and subject to Stage 4 review.
 
-### 2.1 Core Inputs
+| Named Range | Value | Unit / Source |
+|---|---:|---|
+| `FC_AMT` | 5,100,000 | EUR; Scenario 9 |
+| `S0_in` | 1.1144 | USD/EUR; Investing.com close, Nov. 6 |
+| `F0_in` | 1.1705 | USD/EUR; assigned forward placeholder |
+| `R_USD` | 4.19% | Annual; FRED DGS6MO, Nov. 5 |
+| `R_FC` | 3.014% | Annual; Bank of Finland Euribor, Nov. 5 |
+| `K_PUT` | 1.1144 | USD/EUR; at-the-money assumption |
+| `K_CALL` | 1.1144 | USD/EUR; at-the-money assumption |
+| `PREM_PUT` | 0.0194 | USD/EUR; Scenario 9 |
+| `PREM_CALL` | 0.0296 | USD/EUR; Scenario 9 |
+| `T_DAYS` | 182 | Calendar days; Scenario 9 |
+| `BASIS` | 360 | ACT/360 assumption |
 
-| Named Range | Description | Placeholder Value | Unit | Stage 4 Source |
-|---|---|---|---|---|
-| `FC_AMT` | EUR receivable | 5,100,000 | EUR | Scenario 9 (fixed) |
-| `S0_in` | EUR/USD spot rate | 1.1144 (indicative) | USD/EUR | Investing.com daily close, Nov. 6, 2026 |
-| `F0_in` | 182-day forward rate | 1.1705 (indicative) | USD/EUR | Live forward quote or CIP-implied rate |
-| `R_USD` | Annual USD interest rate | 4.19% (indicative) | Annual % | Federal Reserve H.15 / FRED DGS6MO, Nov. 5, 2026 |
-| `R_FC` | Annual EUR interest rate | 3.014% (indicative) | Annual % | Bank of Finland, 6-month Euribor, Nov. 5, 2026 |
-| `K_PUT` | Put option strike | 1.1144 (indicative) | USD/EUR | Set equal to S0_in (at-the-money assumption) |
-| `K_CALL` | Call option strike | 1.1144 (indicative) | USD/EUR | Set equal to S0_in (at-the-money assumption) |
-| `PREM_PUT` | Put premium per EUR | 0.0194 | USD/EUR | Scenario 9 (fixed) |
-| `PREM_CALL` | Call premium per EUR | 0.0296 | USD/EUR | Scenario 9 (fixed) |
-| `T_DAYS` | Days to settlement | 182 | Days | Scenario 9 (fixed) |
-| `BASIS` | Day-count denominator | 360 | Days | ACT/360 assumption |
+**Sources:** [Investing.com EUR/USD](https://www.investing.com/currencies/eur-usd-historical-data); [FRED DGS6MO](https://fred.stlouisfed.org/series/DGS6MO/); [Bank of Finland Euribor](https://www.suomenpankki.fi/en/statistics/interest-rates-and-exchange-rates/euribor-rates/). Treasury yields and Euribor are rate proxies, not company-specific transaction quotes. Scenario-assigned values remain fixed.
 
-**Market Data Sources and Assumptions:**
-
-- **`S0_in` (1.1144 USD/EUR):** Investing.com, EUR/USD Historical Data, November 6, 2026. Indicative daily closing quote. [EUR/USD Historical Data](https://www.investing.com/currencies/eur-usd-historical-data)
-- **`R_USD` (4.19%):** Federal Reserve H.15 / FRED, six-month Treasury yield, November 5, 2026. Used as an indicative USD investment-rate proxy. [FRED DGS6MO](https://fred.stlouisfed.org/series/DGS6MO/)
-- **`R_FC` (3.014%):** Bank of Finland, six-month Euribor, November 5, 2026. Used as an indicative EUR borrowing-rate benchmark. [Euribor Rates](https://www.suomenpankki.fi/en/statistics/interest-rates-and-exchange-rates/euribor-rates/)
-- **Option Strikes:** `K_PUT` and `K_CALL` equal `S0_in` (1.1144 USD/EUR), making both options at-the-money.
-- **Parity:** The assigned forward rate (`F0_in = 1.1705`) differs from the rate implied by the spot and interest-rate placeholders. The discrepancy is reported in Section 7.
-
----
 ## 3. Tab Architecture
 
-The Stage 3 workbook will contain nine worksheets:
-
-- `Cover` — Scenario 9 overview and linked strategy summary.
-- `Legend` — Colors, named ranges, units, and abbreviations.
-- `Inputs` — Editable input values, units, and source references.
-- `No Hedge`, `Forward`, `Money Market`, `Put Option` — Separate formula-driven hedge calculations; money-market borrowing, conversion, and investment appear in three distinct cells.
-- `Sensitivity` — Eleven FX scenarios, proceeds, hedge profits, winner labels, and comparison chart.
-- `Notes & Assumptions` — Market sources, dates, conventions, limitations, and validation notes.
-
-Only designated input cells are editable; all other outputs are formula-linked.
-
----
+The Stage 3 workbook contains nine sheets: `Cover` (strategy summary); `Legend` (colors, units, definitions); `Inputs` (named inputs); `No Hedge`, `Forward`, `Money Market`, and `Put Option` (separate calculations); `Sensitivity` (11 scenarios and chart); and `Notes & Assumptions` (sources, dates, limitations). Only input cells are editable; outputs are formula-linked.
 
 ## 4. Assumptions & Constraints
 
-- **Settlement:** The full €5,100,000 receivable is collected in 182 days without delay or default.
-- **Interest and premiums:** USD/EUR interest rates are constant, using simple ACT/360 interest (`BASIS = 360`). Put premiums are paid upfront and carried to settlement at the USD rate (`DF_USD`).
-- **Market data:** Spot, forward, interest-rate, and strike inputs are indicative placeholders to be reviewed in Stage 4; scenario-assigned amounts, maturity, and premiums remain fixed.
-- **Parity:** Compare `F_IMPLIED` with `F0_in` and flag mismatches above the 0.05% tolerance; inconsistent placeholder quotes do not necessarily indicate a formula error.
-- **Scope and costs:** Exclude bank fees, bid-ask spreads, taxes, credit/settlement risk, dynamic hedging, volatility-based pricing, hedge accounting, and portfolio effects. Include the specified option premium cost.
+- Full EUR collection occurs after 182 days without default; interest rates remain constant and use simple ACT/360.
+- Put premiums are paid upfront; their USD opportunity cost is carried to settlement. Exclude other fees, spreads, and taxes.
+- Market inputs and option strikes are indicative; assigned exposure, maturity, and premiums remain fixed.
+- The initial forward quote is not parity-consistent with spot/rate placeholders. Flag discrepancies; exclude credit risk, dynamic hedging, and hedge accounting.
 
----
 ## 5. Calculation Flow
 
-All calculations use the named inputs in Section 2 and ACT/360 (`BASIS = 360`).
+All formulas reference the Section 2 named inputs.
 
-### 5.1 Derived Values
+**Derived:** `DF_USD = 1 + R_USD*T_DAYS/BASIS`; `DF_FC = 1 + R_FC*T_DAYS/BASIS`; `FV_PREM_PUT = -PREM_PUT*FC_AMT*DF_USD`; `FV_PREM_CALL = -PREM_CALL*FC_AMT*DF_USD`.
 
-- `DF_USD = 1 + R_USD * T_DAYS / BASIS`
-- `DF_FC = 1 + R_FC * T_DAYS / BASIS`
-- `FV_PREM_PUT = -PREM_PUT * FC_AMT * DF_USD`
-- `FV_PREM_CALL = -PREM_CALL * FC_AMT * DF_USD`
-- `S_T(i) = S0_in * (0.95 + 0.01 * i)` for `i = 0,...,10` (`S_T_grid`).
+**No hedge:** `USD_NO_HEDGE(i) = FC_AMT*S_T(i)`.
 
-### 5.2 No Hedge and Forward
+**Forward:** `USD_FWD = FC_AMT*F0_in` (fixed).
 
-- `USD_NO_HEDGE(i) = FC_AMT * S_T(i)`
-- `USD_FWD = FC_AMT * F0_in` (fixed proceeds).
+**Money market — three separate formula cells:**
+1. Borrow EUR: `FC_BORROW = FC_AMT/DF_FC`
+2. Convert to USD: `USD_NOW = FC_BORROW*S0_in`
+3. Invest USD: `USD_MM = USD_NOW*DF_USD`
 
-### 5.3 Money-Market Hedge
+The EUR receivable repays the borrowing at maturity. Check `F_IMPLIED = S0_in*DF_USD/DF_FC`, `PARITY_GAP = F0_in-F_IMPLIED`, and `USD_PARITY_GAP = USD_FWD-USD_MM`.
 
-Display three separate calculation cells on the `Money Market` worksheet:
+**EUR put:** `USD_PUT(i) = MAX(S_T(i),K_PUT)*FC_AMT+FV_PREM_PUT`. The negative premium adjustment reduces net proceeds.
 
-1. Borrow EUR: `FC_BORROW = FC_AMT / DF_FC`
-2. Convert to USD: `USD_NOW = FC_BORROW * S0_in`
-3. Invest USD: `USD_MM = USD_NOW * DF_USD`
-
-At settlement, the receivable repays the EUR loan. Calculate parity diagnostics:
-
-- `F_IMPLIED = S0_in * DF_USD / DF_FC`
-- `PARITY_GAP = F0_in - F_IMPLIED`
-- `USD_PARITY_GAP = USD_FWD - USD_MM`
-
-### 5.4 Put Option Hedge
-
-- `USD_PUT(i) = MAX(S_T(i), K_PUT) * FC_AMT + FV_PREM_PUT`
-
-The put protects against EUR depreciation while allowing upside; `FV_PREM_PUT` is negative because the premium is paid upfront and carried to settlement.
-
-### 5.5 Comparison Outputs
-
-For each of the 11 scenarios, compare `USD_NO_HEDGE(i)`, `USD_FWD`, `USD_MM`, and `USD_PUT(i)`. Calculate:
-
-- `HEDGE_PROFIT_k(i) = USD_k(i) - USD_NO_HEDGE(i)` for each hedge.
-- `USD_BASE_k` = strategy proceeds when `S_T = S0_in`.
-- `USD_FLOOR_PUT = MIN(USD_PUT(i))` across the scenario grid.
-- Overall winner = highest USD proceeds among all four strategies.
-- Best active hedge = highest proceeds among forward, money-market, and put.
-
----
+**Comparison:** `HEDGE_PROFIT_k(i) = USD_k(i)-USD_NO_HEDGE(i)` for each active hedge. Calculate baseline proceeds `USD_BASE_k` at `S_T=S0_in`, put floor `USD_FLOOR_PUT=MIN(USD_PUT(i))`, the overall highest-proceeds strategy, and the best active hedge.
 
 ## 6. Sensitivity Plan
 
-The `Sensitivity` worksheet will evaluate 11 settlement exchange rates from −5% to +5% of `S0_in` in 1% increments, including the baseline (`i = 0,...,10`). The grid and strategy calculations follow Section 5.
-
-- **Comparison:** Display USD proceeds for no hedge, forward, money market, and put option; calculate hedge profits versus no hedge and identify the overall winner and best active hedge in each scenario.
-- **Chart:** Plot settlement rate `S_T(i)` (USD/EUR) on the x-axis and USD proceeds on the y-axis. Forward and money-market proceeds remain constant, unhedged proceeds vary linearly, and the put provides a downside floor with upside potential.
-
----
+Generate 11 exchange rates: `S_T(i)=S0_in*(0.95+0.01*i)`, for `i=0,...,10` (±5% in 1% steps). Compare all four strategies, hedge profits, and winning strategies. Create one line chart with USD/EUR settlement rate on the x-axis and USD proceeds on the y-axis. Forward and money-market lines remain flat; no hedge is linear; the put has a downside floor.
 
 ## 7. Validation Rules
 
-The Stage 3 workbook must pass these checks:
-
-- [ ] **Named ranges:** All ten required names in Section 2 are defined; calculated results use formulas.
-- [ ] **Forward:** `USD_FWD = FC_AMT * F0_in = $5,969,550` and remains constant.
-- [ ] **Money market:** Verify the three separate calculation cells: `FC_BORROW * DF_FC = FC_AMT`, `USD_NOW = FC_BORROW * S0_in`, and `USD_MM = USD_NOW * DF_USD`. Expected `USD_MM ≈ $5,716,722.80`.
-- [ ] **Interest-rate parity:** `F_IMPLIED = S0_in * DF_USD / DF_FC ≈ 1.120926`. Pass when `ABS(F0_in - F_IMPLIED) / F_IMPLIED <= 0.0005` (0.05%). Current placeholders must flag an input mismatch.
-- [ ] **Put option:** At `S_T = K_PUT`, verify `USD_PUT = K_PUT * FC_AMT + FV_PREM_PUT`; proceeds stay at the net floor below the strike and rise above it.
-- [ ] **Sensitivity:** Exactly 11 scenarios from `0.95 * S0_in` to `1.05 * S0_in`, including the baseline; forward and money-market proceeds remain constant.
-- [ ] **Integrity:** No Excel formula errors (`#REF!`, `#VALUE!`, `#DIV/0!`). Sources/dates appear in `Notes & Assumptions`; `Legend` defines yellow inputs, blue assumptions, black formulas, and green cross-tab links.
-
----
+- [ ] All ten required named ranges exist; calculations are formula-driven.
+- [ ] Forward proceeds equal **$5,969,550** across scenarios.
+- [ ] Money-market steps satisfy `FC_BORROW*DF_FC=FC_AMT` and `USD_MM=USD_NOW*DF_USD`; expected **$5,716,722.80**.
+- [ ] Implied forward is approximately **1.120926**. Parity passes only if `ABS(F0_in-F_IMPLIED)/F_IMPLIED <= 0.0005`. Current inputs must flag a mismatch.
+- [ ] Put proceeds equal the net floor below `K_PUT` and rise above the strike.
+- [ ] Exactly 11 sensitivity rows; forward and money-market values stay fixed.
+- [ ] No `#REF!`, `#VALUE!`, or `#DIV/0!` errors. Sources/dates are recorded; Legend identifies yellow inputs, blue assumptions, black formulas, and green cross-sheet links.
 
 ## 8. Outputs
 
-| Output | Description / Named Results | Worksheet |
-|---|---|---|
-| Input panel | All required named inputs, values, units, and sources | `Inputs` |
-| Strategy summary | `USD_FWD`, `USD_MM`, `USD_BASE_k`, and `USD_FLOOR_PUT` | `Cover` and `Sensitivity` |
-| Parity diagnostics | `F_IMPLIED`, `PARITY_GAP`, and `USD_PARITY_GAP` | `Money Market` |
-| Sensitivity table | `S_T_grid` and `USD_NO_HEDGE(i)`, `USD_FWD`, `USD_MM`, `USD_PUT(i)` for all 11 scenarios | `Sensitivity` |
-| Hedge-profit columns | `HEDGE_PROFIT_k(i)` for each active hedge versus no hedge | `Sensitivity` |
-| Winner labels | Overall highest-proceeds strategy and best active hedge for each scenario | `Sensitivity` |
-| Comparison chart | One line chart comparing all four strategies against `S_T(i)` | `Sensitivity` |
-| Sources and assumptions | Source dates, rate conventions, exclusions, and validation notes | `Notes & Assumptions` |
-| Stage 5 decision memo | Final recommendation supported by the workbook's results | Separate downstream deliverable |
+The workbook produces a linked `Cover` summary; an 11-row `Sensitivity` table with USD proceeds, hedge profits, winner labels, and a comparison chart; `Money Market` parity diagnostics; and documented inputs and sources.
 
-### 8.1 Computed Base-Case Values
-
-The base case uses `S_T = S0_in`. The following results will be populated and verified during the Stage 3 workbook build and used as regression checkpoints when market data is updated in Stage 4. Scenario 9 concerns a EUR receivable; payable outputs are not applicable.
-
-| Strategy | USD Proceeds | Hedge Profit vs. No Hedge |
-|---|---:|---:|
-| No hedge | To be populated in Stage 3 | — |
-| Forward | To be populated in Stage 3 | To be populated in Stage 3 |
-| Money market | To be populated in Stage 3 | To be populated in Stage 3 |
-| Put option | To be populated in Stage 3 | To be populated in Stage 3 |
+**Base case (`S_T=1.1144`):** No hedge **$5,683,440**; forward **$5,969,550**; money market **$5,716,722.80**; put **$5,582,404.18**. These preliminary checkpoints will be verified in Stage 3 and used to support the Stage 5 decision memo.
 
 ---
 
