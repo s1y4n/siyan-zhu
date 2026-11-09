@@ -60,21 +60,11 @@ Only designated input cells are editable; all other outputs are formula-linked.
 
 ## 4. Assumptions & Constraints
 
-The model uses the following assumptions and constraints:
-
-1. **Settlement:** The full EUR 5,100,000 receivable is collected in 182 days without delays or defaults and converted into USD.
-
-2. **Interest Rates:** USD and EUR interest rates remain constant and use simple interest with ACT/360 (`BASIS = 360`).
-
-3. **Market Data:** Spot, forward, and interest rates and option strikes are indicative placeholders to be reviewed in Stage 4. Scenario-assigned amounts, maturity, and premiums remain fixed.
-
-4. **Transaction Costs:** Bank fees, bid-ask spreads, taxes, and other transaction costs are excluded, except for the specified option premiums.
-
-5. **Option Premiums:** Put premiums are paid upfront and carried forward to settlement using `DF_USD`. Net put proceeds include this cost, providing downside protection while preserving potential upside.
-
-6. **Covered Interest Rate Parity:** The model compares the implied forward rate with `F0_in`. Because current placeholders are not parity-consistent, discrepancies are flagged and reviewed using consistent quotes in Stage 4.
-
-7. **Model Scope:** The model compares no hedge, forward, money-market, and put-option strategies for one EUR receivable. Credit and settlement risk, dynamic hedging, volatility-based option pricing, hedge accounting, and multi-currency portfolio effects are excluded.
+- **Settlement:** The full €5,100,000 receivable is collected in 182 days without delay or default.
+- **Interest and premiums:** USD/EUR interest rates are constant, using simple ACT/360 interest (`BASIS = 360`). Put premiums are paid upfront and carried to settlement at the USD rate (`DF_USD`).
+- **Market data:** Spot, forward, interest-rate, and strike inputs are indicative placeholders to be reviewed in Stage 4; scenario-assigned amounts, maturity, and premiums remain fixed.
+- **Parity:** Compare `F_IMPLIED` with `F0_in` and flag mismatches above the 0.05% tolerance; inconsistent placeholder quotes do not necessarily indicate a formula error.
+- **Scope and costs:** Exclude bank fees, bid-ask spreads, taxes, credit/settlement risk, dynamic hedging, volatility-based pricing, hedge accounting, and portfolio effects. Include the specified option premium cost.
 
 ---
 
