@@ -127,15 +127,15 @@ The `Sensitivity` worksheet will evaluate 11 settlement exchange rates from −5
 
 ## 7. Validation Rules
 
-The Stage 3 workbook must satisfy these checks:
+The Stage 3 workbook must pass these checks:
 
-- [ ] **Named Ranges:** All ten required names from Section 2.1 are defined; calculated outputs use formulas rather than hardcoded values.
-- [ ] **Forward Hedge:** `USD_FWD = FC_AMT * F0_in` must equal $5,969,550 using the initial placeholders and remain constant across all scenarios.
-- [ ] **Money-Market Hedge:** Verify `FC_BORROW * DF_FC = FC_AMT`, `USD_NOW = FC_BORROW * S0_in`, and `USD_MM = USD_NOW * DF_USD` in three separate calculation cells. Expected initial USD_MM is approximately $5,716,722.80.
-- [ ] **Interest Rate Parity:** Verify `F_IMPLIED = S0_in * DF_USD / DF_FC`. The parity check passes when `ABS(F0_in - F_IMPLIED) / F_IMPLIED <= 0.0005` (0.05%). The initial placeholders imply approximately 1.120926 USD/EUR, so this check must flag an input mismatch, not pass.
-- [ ] **Put Option:** At `S_T = K_PUT`, verify `USD_PUT = K_PUT * FC_AMT + FV_PREM_PUT`. Proceeds must stay at the net floor below the strike and increase above it.
-- [ ] **Sensitivity:** Generate exactly 11 scenarios from `0.95 * S0_in` to `1.05 * S0_in` in 1% steps. Include the baseline and verify that forward and money-market proceeds remain constant.
-- [ ] **Workbook Integrity:** No formula errors (`#REF!`, `#VALUE!`, `#DIV/0!`); calculated outputs are formula-driven. The `Notes & Assumptions` worksheet records sources and access dates. The Legend defines yellow inputs, blue assumptions, black formulas, and green cross-tab links.
+- [ ] **Named ranges:** All ten required names in Section 2 are defined; calculated results use formulas.
+- [ ] **Forward:** `USD_FWD = FC_AMT * F0_in = $5,969,550` and remains constant.
+- [ ] **Money market:** Verify the three separate calculation cells: `FC_BORROW * DF_FC = FC_AMT`, `USD_NOW = FC_BORROW * S0_in`, and `USD_MM = USD_NOW * DF_USD`. Expected `USD_MM ≈ $5,716,722.80`.
+- [ ] **Interest-rate parity:** `F_IMPLIED = S0_in * DF_USD / DF_FC ≈ 1.120926`. Pass when `ABS(F0_in - F_IMPLIED) / F_IMPLIED <= 0.0005` (0.05%). Current placeholders must flag an input mismatch.
+- [ ] **Put option:** At `S_T = K_PUT`, verify `USD_PUT = K_PUT * FC_AMT + FV_PREM_PUT`; proceeds stay at the net floor below the strike and rise above it.
+- [ ] **Sensitivity:** Exactly 11 scenarios from `0.95 * S0_in` to `1.05 * S0_in`, including the baseline; forward and money-market proceeds remain constant.
+- [ ] **Integrity:** No Excel formula errors (`#REF!`, `#VALUE!`, `#DIV/0!`). Sources/dates appear in `Notes & Assumptions`; `Legend` defines yellow inputs, blue assumptions, black formulas, and green cross-tab links.
 
 ---
 
