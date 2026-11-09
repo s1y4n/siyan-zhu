@@ -67,70 +67,52 @@ Only designated input cells are editable; all other outputs are formula-linked.
 - **Scope and costs:** Exclude bank fees, bid-ask spreads, taxes, credit/settlement risk, dynamic hedging, volatility-based pricing, hedge accounting, and portfolio effects. Include the specified option premium cost.
 
 ---
-
 ## 5. Calculation Flow
 
-All calculations use named ranges rather than cell references. The model evaluates USD proceeds from a EUR receivable.
+All calculations use the named inputs in Section 2 and ACT/360 (`BASIS = 360`).
 
-### 5.1 Derived Inputs
+### 5.1 Derived Values
 
 - `DF_USD = 1 + R_USD * T_DAYS / BASIS`
 - `DF_FC = 1 + R_FC * T_DAYS / BASIS`
 - `FV_PREM_PUT = -PREM_PUT * FC_AMT * DF_USD`
 - `FV_PREM_CALL = -PREM_CALL * FC_AMT * DF_USD`
-- `S_T(i) = S0_in * (0.95 + 0.01 * i)`, for `i = 0, 1, ..., 10` (`S_T_grid`)
-- `USD_NO_HEDGE(i) = S_T(i) * FC_AMT`
+- `S_T(i) = S0_in * (0.95 + 0.01 * i)` for `i = 0,...,10` (`S_T_grid`).
 
-Interest and premium calculations use ACT/360 (`BASIS = 360`).
-
-### 5.2 No Hedge and Forward Hedge
+### 5.2 No Hedge and Forward
 
 - `USD_NO_HEDGE(i) = FC_AMT * S_T(i)`
-- `USD_FWD = FC_AMT * F0_in`
-
-Unhedged proceeds change with the settlement exchange rate, while forward proceeds remain fixed at $5,969,550 using the assigned forward placeholder.
+- `USD_FWD = FC_AMT * F0_in` (fixed proceeds).
 
 ### 5.3 Money-Market Hedge
 
-Calculate the following in three separate formula cells on the `Money Market` worksheet:
+Display three separate calculation cells on the `Money Market` worksheet:
 
-1. **Borrow EUR:** `FC_BORROW = FC_AMT / DF_FC`
-2. **Convert to USD:** `USD_NOW = FC_BORROW * S0_in`
-3. **Invest USD:** `USD_MM = USD_NOW * DF_USD`
+1. Borrow EUR: `FC_BORROW = FC_AMT / DF_FC`
+2. Convert to USD: `USD_NOW = FC_BORROW * S0_in`
+3. Invest USD: `USD_MM = USD_NOW * DF_USD`
 
-At maturity, the EUR receivable repays the EUR borrowing, while the USD investment represents the hedged proceeds.
-
-**Parity checks:**
+At settlement, the receivable repays the EUR loan. Calculate parity diagnostics:
 
 - `F_IMPLIED = S0_in * DF_USD / DF_FC`
 - `PARITY_GAP = F0_in - F_IMPLIED`
 - `USD_PARITY_GAP = USD_FWD - USD_MM`
 
-The workbook must report parity discrepancies rather than treating inconsistent placeholder quotes as formula errors.
-
 ### 5.4 Put Option Hedge
-
-The company purchases a EUR put at strike `K_PUT`. The upfront premium is `PREM_PUT * FC_AMT`, and its settlement-date cost is represented by the negative value `FV_PREM_PUT`.
 
 - `USD_PUT(i) = MAX(S_T(i), K_PUT) * FC_AMT + FV_PREM_PUT`
 
-The put establishes a minimum net USD proceeds level while preserving upside when the euro appreciates.
+The put protects against EUR depreciation while allowing upside; `FV_PREM_PUT` is negative because the premium is paid upfront and carried to settlement.
 
-### 5.5 Sensitivity and Summary Outputs
+### 5.5 Comparison Outputs
 
-For each scenario `i = 0, 1, ..., 10`, calculate `USD_NO_HEDGE(i)`, `USD_FWD`, `USD_MM`, and `USD_PUT(i)`.
+For each of the 11 scenarios, compare `USD_NO_HEDGE(i)`, `USD_FWD`, `USD_MM`, and `USD_PUT(i)`. Calculate:
 
-- `HEDGE_PROFIT_k(i) = USD_k(i) - USD_NO_HEDGE(i)` for each active hedge.
-- Overall winner: strategy with the highest USD proceeds, including no hedge.
-- Best active hedge: highest proceeds among forward, money-market, and put strategies.
-- `USD_BASE_k`: each strategy's proceeds at `S_T = S0_in`.
-- `USD_FLOOR_PUT = MIN(USD_PUT(i))` across the sensitivity grid.
-
-The full sensitivity grid and chart are specified in Section 6.
-
-### 5.6 Payable Variant (Reference Only)
-
-For a EUR payable, the company would buy EUR forward, borrow USD and invest in EUR for the money-market hedge, or purchase a EUR call. The call's net USD outlay is `FC_AMT * MIN(S_T(i), K_CALL) - FV_PREM_CALL`. The preferred strategy minimizes USD outlay. Scenario 9 models a receivable, so the payable variant is not part of the four-strategy comparison.
+- `HEDGE_PROFIT_k(i) = USD_k(i) - USD_NO_HEDGE(i)` for each hedge.
+- `USD_BASE_k` = strategy proceeds when `S_T = S0_in`.
+- `USD_FLOOR_PUT = MIN(USD_PUT(i))` across the scenario grid.
+- Overall winner = highest USD proceeds among all four strategies.
+- Best active hedge = highest proceeds among forward, money-market, and put.
 
 ---
 
