@@ -118,14 +118,10 @@ For each of the 11 scenarios, compare `USD_NO_HEDGE(i)`, `USD_FWD`, `USD_MM`, an
 
 ## 6. Sensitivity Plan
 
-The `Sensitivity` worksheet will compare all four strategies across 11 settlement exchange-rate scenarios.
+The `Sensitivity` worksheet will evaluate 11 settlement exchange rates from −5% to +5% of `S0_in` in 1% increments, including the baseline (`i = 0,...,10`). The grid and strategy calculations follow Section 5.
 
-- **Exchange-rate grid:** `S_T(i) = S0_in * (0.95 + 0.01 * i)`, where `i = 0, 1, ..., 10`. This covers ±5% of the initial spot rate in 1% increments, including the baseline.
-- **Strategy comparison:** Calculate `USD_NO_HEDGE(i)`, `USD_FWD`, `USD_MM`, and `USD_PUT(i)` for every scenario using the formulas in Section 5.
-- **Comparison chart:** Create one line chart with `S_T(i)` (USD/EUR) on the x-axis and USD proceeds on the y-axis. The forward and money-market lines remain flat, the unhedged line changes linearly, and the put-option line provides a floor with upside potential.
-- **Additional outputs:** Include hedge profit versus no hedge and identify both the highest-proceeds strategy overall and the best active hedge for each scenario.
-
-The chart will help the CFO compare guaranteed proceeds, downside protection, option costs, and exposure to favorable or unfavorable exchange-rate movements.
+- **Comparison:** Display USD proceeds for no hedge, forward, money market, and put option; calculate hedge profits versus no hedge and identify the overall winner and best active hedge in each scenario.
+- **Chart:** Plot settlement rate `S_T(i)` (USD/EUR) on the x-axis and USD proceeds on the y-axis. Forward and money-market proceeds remain constant, unhedged proceeds vary linearly, and the put provides a downside floor with upside potential.
 
 ---
 
