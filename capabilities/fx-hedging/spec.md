@@ -1,7 +1,7 @@
 
 # FX Hedging — Scenario 9: Technical Specification
 
-**University of Hawaiʻi at Mānoa | FIN 321 | Version 0.4 | November 8, 2026**
+**University of Hawaiʻi at Mānoa | FIN 321 | Version 0.5 | November 13, 2026**
 
 ## 1. Problem Statement
 
@@ -59,6 +59,8 @@ The EUR receivable repays the borrowing at maturity. Check `F_IMPLIED = S0_in*DF
 
 EUR call (payable reference only): `USD_CALL_PAYABLE(i) = MIN(S_T(i),K_CALL)*FC_AMT-FV_PREM_CALL`. This is included as a reference for foreign-currency payables and is not part of the four active receivable hedging strategies.
 
+**Call option check figure:** At `S_T = 1.1144`, `USD_CALL_PAYABLE = $5,837,597.75`, including the future value of the call premium.
+
 **Comparison:** `HEDGE_PROFIT_k(i) = USD_k(i)-USD_NO_HEDGE(i)` for each active hedge. Calculate baseline proceeds `USD_BASE_k` at `S_T=S0_in`, put floor `USD_FLOOR_PUT=MIN(USD_PUT(i))`, the overall highest-proceeds strategy, and the best active hedge.
 
 ## 6. Sensitivity Plan
@@ -67,7 +69,7 @@ Generate 11 exchange rates: `S_T(i)=S0_in*(0.95+0.01*i)`, for `i=0,...,10` (±5%
 
 ## 7. Validation Rules
 
-- [ ] All ten required named ranges exist; calculations are formula-driven.
+- [ ] All eleven required named ranges exist; calculations are formula-driven.
 - [ ] Forward proceeds equal **$5,969,550** across scenarios.
 - [ ] Money-market steps satisfy `FC_BORROW*DF_FC=FC_AMT` and `USD_MM=USD_NOW*DF_USD`; expected **$5,716,722.80**.
 - [ ] Implied forward is approximately **1.120926**. Parity passes only if `ABS(F0_in-F_IMPLIED)/F_IMPLIED <= 0.0005`. Current inputs must flag a mismatch.
@@ -91,3 +93,4 @@ The workbook produces a linked `Cover` summary; an 11-row `Sensitivity` table wi
 | 0.2 | 2026-11-07 | Siyan Zhu | Reorganized sections, added validation rules, and clarified model assumptions |
 | 0.3 | 2026-11-07 | Siyan Zhu | Refined model specification following AI review and documented validation improvements |
 | 0.4 | 2026-11-08 | Siyan Zhu | Updated spot-rate placeholder, option strikes, source documentation, and validation checkpoints |
+| 0.5 | 2026-11-13 | Siyan Zhu | Restored EUR call payable reference, added check figure, and corrected validation checklist |
