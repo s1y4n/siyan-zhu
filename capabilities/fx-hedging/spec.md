@@ -57,6 +57,8 @@ The EUR receivable repays the borrowing at maturity. Check `F_IMPLIED = S0_in*DF
 
 **EUR put:** `USD_PUT(i) = MAX(S_T(i),K_PUT)*FC_AMT+FV_PREM_PUT`. The negative premium adjustment reduces net proceeds.
 
+EUR call (payable reference only): `USD_CALL_PAYABLE(i) = MIN(S_T(i),K_CALL)*FC_AMT-FV_PREM_CALL`. This is included as a reference for foreign-currency payables and is not part of the four active receivable hedging strategies.
+
 **Comparison:** `HEDGE_PROFIT_k(i) = USD_k(i)-USD_NO_HEDGE(i)` for each active hedge. Calculate baseline proceeds `USD_BASE_k` at `S_T=S0_in`, put floor `USD_FLOOR_PUT=MIN(USD_PUT(i))`, the overall highest-proceeds strategy, and the best active hedge.
 
 ## 6. Sensitivity Plan
