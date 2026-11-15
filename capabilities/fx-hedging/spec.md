@@ -76,6 +76,8 @@ Generate 11 exchange rates: `S_T(i)=S0_in*(0.95+0.01*i)`, for `i=0,...,10` (±5%
 - [ ] Put proceeds equal the net floor below `K_PUT` and rise above the strike.
 - [ ] Exactly 11 sensitivity rows; forward and money-market values stay fixed.
 - [ ] No `#REF!`, `#VALUE!`, or `#DIV/0!` errors. Sources/dates are recorded; Legend identifies yellow inputs, blue assumptions, black formulas, and green cross-sheet links.
+- [ ] Currency formatting is correct throughout the workbook: EUR amounts display €, USD amounts display $, and exchange rates display USD/EUR without a currency symbol.
+- [ ] Sensitivity scenario indices display as integers from 0 through 10, including 0 rather than a dash.
 
 ## 8. Outputs
 
