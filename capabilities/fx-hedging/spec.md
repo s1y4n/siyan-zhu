@@ -1,7 +1,7 @@
 
 # FX Hedging — Scenario 9: Technical Specification
 
-**University of Hawaiʻi at Mānoa | FIN 321 | Version 0.5 | November 13, 2026**
+**University of Hawaiʻi at Mānoa | FIN 321 | Version 0.6 | November 14, 2026**
 
 ## 1. Problem Statement
 
@@ -75,7 +75,7 @@ Generate 11 exchange rates: `S_T(i)=S0_in*(0.95+0.01*i)`, for `i=0,...,10` (±5%
 - [ ] Implied forward is approximately **1.120926**. Parity passes only if `ABS(F0_in-F_IMPLIED)/F_IMPLIED <= 0.0005`. Current inputs must flag a mismatch.
 - [ ] Put proceeds equal the net floor below `K_PUT` and rise above the strike.
 - [ ] Exactly 11 sensitivity rows; forward and money-market values stay fixed.
-- [ ] No `#REF!`, `#VALUE!`, or `#DIV/0!` errors. Sources/dates are recorded; Legend identifies yellow inputs, blue assumptions, black formulas, and green cross-sheet links.
+- [ ] No `#REF!`, `#VALUE!`, or `#DIV/0!` errors. Sources/dates are recorded; Legend identifies yellow inputs, blue assumptions, green formulas, and gray outputs.
 - [ ] Currency formatting is correct throughout the workbook: EUR amounts display €, USD amounts display $, and exchange rates display USD/EUR without a currency symbol.
 - [ ] Sensitivity scenario indices display as integers from 0 through 10, including 0 rather than a dash.
 
@@ -96,3 +96,4 @@ The workbook produces a linked `Cover` summary; an 11-row `Sensitivity` table wi
 | 0.3 | 2026-11-07 | Siyan Zhu | Refined model specification following AI review and documented validation improvements |
 | 0.4 | 2026-11-08 | Siyan Zhu | Updated spot-rate placeholder, option strikes, source documentation, and validation checkpoints |
 | 0.5 | 2026-11-13 | Siyan Zhu | Restored EUR call payable reference, added check figure, and corrected validation checklist |
+| 0.6 | 2026-11-14 | Siyan Zhu | Clarified currency formatting, sensitivity scenario indices, and workbook requirements following Stage 3 audit. |
