@@ -107,3 +107,42 @@ I accepted this correction because a failed parity check may result from inconsi
 ### Reflection
 
 I used ChatGPT throughout the drafting and review process to understand financial concepts, develop formulas, improve the document's organization, and identify inconsistencies. Rather than automatically accepting every suggestion, I reviewed the feedback and made revisions manually in GitHub. This helped me better understand the model's calculations and create a clearer specification for the Stage 3 AI-assisted workbook build.
+
+## November 14, 2026 — FX Hedging Stage 3: AI-Assisted Build and Audit
+
+**AI Tool:** ChatGPT (OpenAI)
+
+**Task:** Build and audit an Excel workbook for FX Hedging Scenario 9 using my Stage 2 specification.
+
+**What I asked AI to do:**
+- I shared my Stage 2 specification and the Stage 3 assignment instructions.
+- I asked ChatGPT to walk me through the assignment and generate a downloadable Excel workbook.
+- I used ChatGPT to help me understand how to check named ranges, formulas, and sensitivity calculations in Excel.
+- I asked for help correcting formatting errors and regenerating the workbook.
+
+**Some prompts I used:**
+- "this is my stage 3. walk me through it."
+- "okay lets start."
+- "it works let move on to the currency fix"
+- "are u sure we can regenerate the workbook so fast? did we finish all the professors requirements already?"
+
+**What I checked or changed:**
+- Verified all 11 named input ranges in Excel's Name Manager.
+- Checked that calculated cells contained formulas instead of hard-coded values.
+- Changed the spot rate from 1.1144 to 1.1000 to test whether the sensitivity table and chart recalculated.
+- Verified the money-market hedge calculations and expected parity mismatch.
+- Found that the first sensitivity scenario displayed a dash instead of zero.
+- Found that two EUR amounts incorrectly displayed dollar signs.
+- Updated my Stage 2 specification to Version 0.6 with clearer formatting requirements.
+- Regenerated the workbook and verified the corrections.
+- Corrected an incorrect settlement date on the Cover sheet.
+
+**Errors or limitations:**
+
+The first AI-generated workbook had formatting problems that I found while reviewing it in Excel. I also noticed that an earlier workbook showed the wrong settlement date. I did not assume the AI output was correct and checked the workbook against my specification.
+
+ChatGPT also had trouble providing a working download link, so I requested another downloadable copy.
+
+**Result:**
+
+Created an Excel workbook with nine worksheets, 11 named inputs, formula-driven calculations, and a sensitivity chart. I reviewed the workbook in Excel, documented my findings in a separate audit report, and verified the regenerated corrections. I used ChatGPT to help build and troubleshoot the model, but I performed the Excel checks and GitHub uploads myself.
