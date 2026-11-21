@@ -3,6 +3,7 @@
 **Student:** Siyan Zhu  
 **Course:** FIN 321, University of Hawaiʻi at Mānoa  
 **Audit date:** November 14, 2026  
+**Follow-up audit:** November 20, 2026, responding to professor's November 16 feedback  
 **Specification:** `capabilities/fx-hedging/spec.md` (Version 0.6)  
 **Workbook:** `capabilities/fx-hedging/model.xlsx`
 
@@ -58,6 +59,31 @@ I used ChatGPT to help build the Excel workbook from my Stage 2 specification. I
 
 **What I did:** I corrected this issue in the regenerated build and verified that the final Cover sheet shows **May 7, 2027**. The correct date was already written in the Stage 2 specification.
 
+## Finding 7 — Workbook-wide formula integrity (follow-up to feedback, November 20)
+
+**What I checked:** My earlier formulas-only test focused on one cell. To address the November 16 feedback, I checked every one of the **251 original calculated cells**. I added a `Formula Audit` worksheet using Excel's `ISFORMULA()` and `SUMPRODUCT()` functions over explicitly defined formula-only ranges. It records the expected and observed formula counts for each sheet. I also added a **15th validation row at `Cover!A38:F38`**, which links to the overall result. The audit formulas and Cover row 38 are excluded from their own source ranges to avoid self-counting and circular references.
+
+**Ranges and expected counts:**
+
+| Worksheet | Exact ranges checked | Expected formulas |
+|---|---|---:|
+| Cover | `B7`, `B14:C17`, `B24:B37`, `D24:E37`, `C34`, `B39:E39` | 56 |
+| No Hedge | `B8:B10`, `A17:B27` | 25 |
+| Forward | `B8:B10`, `B13:B14` | 5 |
+| Money Market | `B7:B8`, `B10:B12`, `B15:B19`, `B22:B23` | 12 |
+| Put Option | `B7:B11`, `B16:B19` | 9 |
+| Sensitivity | `A7:M17` | 143 |
+| Notes & Assumptions | `B12` | 1 |
+| **Total** | **All original calculated cells** | **251** |
+
+**How the Excel check works:** For each range, `ISFORMULA(reference)` tests whether each cell contains a formula; `SUMPRODUCT(--ISFORMULA(reference))` counts formula cells. The worksheet adds the counts and compares each sheet's total with its expected number. For example, the entire `Sensitivity!A7:M17` block should contain **143** formulas. The detailed per-sheet results appear on `Formula Audit!A6:F14`, and the workbook-wide status appears at `Cover!A38:F38`.
+
+**What I found:** An independent inspection of the Stage 3 workbook found that **251 out of 251 original calculated cells contained formulas**, with **zero missing or overwritten formula cells**. The file was exported with every original formula unchanged and the full Excel integrity check added. After opening and recalculating the updated workbook in Microsoft Excel, I confirmed `Formula Audit!B14` displayed **251**, `Formula Audit!E14` displayed **PASS**, `Cover!B38` displayed **251**, and `Cover!E38` displayed **PASS**. No missing or overwritten formula cells were reported. This test checks formula presence, not whether every formula is mathematically correct; the separate hedge and sensitivity checks cover mathematical behavior.
+
+**What I did:** I kept the original input values, calculation formulas, sensitivity grid and chart unchanged. I added the audit worksheet and the Cover validation row rather than replacing formulas with hardcoded check values. **Excel verification completed:** I recalculated the workbook and confirmed the formula audit and the Cover check both showed **PASS**. No original model inputs or calculation formulas were changed during this follow-up audit.
+
 ## Conclusion
 
-The audit identified formatting and display problems that were not obvious from the calculated results alone. I updated the specification to make the currency and scenario-index rules explicit, regenerated the workbook, and checked those corrections in Excel. I also confirmed that the formulas I spot-checked recalculate, the money-market steps match the expected check figures, and the forward-parity mismatch remains flagged rather than being hidden. The final workbook should be committed together with this audit note and the updated AI prompt log.
+The audit identified formatting and display problems that were not obvious from the calculated results alone. I updated the specification to make the currency and scenario-index rules explicit, regenerated the workbook, and checked those corrections in Excel. I also confirmed that the formulas I spot-checked recalculate, the money-market steps match the expected check figures, and the forward-parity mismatch remains flagged rather than being hidden.
+
+The November 20 follow-up expands the formulas-only check from one cell to every one of the original 251 calculated cells. The independent inspection found no missing formulas. The new Excel check was also confirmed after recalculation: **251 of 251 formula cells**, with **PASS** shown in both the Formula Audit worksheet and the Cover. The final workbook and this updated audit note are ready to commit; I will also update the AI prompt log to record assistance with the follow-up audit.
