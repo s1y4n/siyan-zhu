@@ -146,3 +146,15 @@ ChatGPT also had trouble providing a working download link, so I requested anoth
 **Result:**
 
 Created an Excel workbook with nine worksheets, 11 named inputs, formula-driven calculations, and a sensitivity chart. I reviewed the workbook in Excel, documented my findings in a separate audit report, and verified the regenerated corrections. I used ChatGPT to help build and troubleshoot the model, but I performed the Excel checks and GitHub uploads myself.
+
+2026-11-20 — Stage 3: Professor Feedback and Formula Audit
+
+AI Tool: ChatGPT (OpenAI)
+
+Prompt: I provided ChatGPT with my professor's Stage 3 feedback and asked for help improving my formulas-only audit to check all 251 calculated cells instead of just one.
+
+AI Assistance: ChatGPT helped create a workbook-wide formula integrity check using Excel's ISFORMULA() and SUMPRODUCT() functions. It added a Formula Audit worksheet and a 15th validation check on the Cover. ChatGPT also helped document the results as Finding 7 in my build-audit analysis.
+
+Results and Verification: The audit confirmed that all 251 original calculated cells contained formulas, with no missing or overwritten formulas. I opened the updated workbook in Excel and personally confirmed that the Formula Audit and Cover checks both displayed PASS. The original model inputs and calculation formulas were preserved.
+
+Human Review: I reviewed the changes and verified the results in Excel before preparing the updated files for GitHub.
