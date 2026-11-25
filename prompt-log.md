@@ -158,3 +158,15 @@ AI Assistance: ChatGPT helped create a workbook-wide formula integrity check usi
 Results and Verification: The audit confirmed that all 251 original calculated cells contained formulas, with no missing or overwritten formulas. I opened the updated workbook in Excel and personally confirmed that the Formula Audit and Cover checks both displayed PASS. The original model inputs and calculation formulas were preserved.
 
 Human Review: I reviewed the changes and verified the results in Excel before preparing the updated files for GitHub.
+
+### 2026-11-24 — Stage 4: Market Data and Workbook Population
+
+**AI Tool:** ChatGPT (OpenAI)
+
+**Prompt:** I asked ChatGPT to help me complete Stage 4 using my audited Stage 3 FX hedging workbook, including finding market data, updating the inputs, checking calculations, and documenting the results.
+
+**AI Assistance:** ChatGPT helped locate market data from the European Central Bank, U.S. Treasury, and Bank of Finland. It helped populate my Excel workbook with the updated spot and interest rates, calculate the CIP-implied forward, and update the validation checks to work with the new inputs. ChatGPT also helped prepare the market-data memo, organize the sources and assumptions, and analyze differences between my workbook and the FX Hedging Lab.
+
+**Results and Verification:** I opened the updated workbook in Excel and confirmed that the formula audit passed with all 257 calculated cells containing formulas. I also entered the inputs into the professor's FX Hedging Lab and compared the forward, money-market, and sensitivity results with my workbook. The calculations matched, except for a difference in the put-option results caused by the treatment of the upfront premium. The workbook includes the premium's future value, while the lab uses the upfront amount. I kept the workbook's original treatment because it was approved in Stage 3 and documented the difference in the memo.
+
+**Human Review:** I personally verified the Excel checks and FX Lab results. The original scenario assumptions, including the assigned forward quote and option premiums, were preserved. The forward-parity discrepancy was documented rather than adjusted to force a passing result.
